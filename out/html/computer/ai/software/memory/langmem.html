@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LangMem</title>
+</head>
+<body>
+<h1>LangMem</h1>
+<p>LangMem is an open-source Python SDK developed by LangChain to provide AI agents and LangGraph workflows with long-term memory. It allows agents to learn, adapt, and maintain behavioral consistency across sessions by automatically extracting, storing, and consolidating semantic facts, episodic interaction summaries, and procedural execution patterns.</p>
+<pre><code class="language-mermaid">graph TD
+    Interaction[User &amp; Agent Interaction] --&gt; Collector[Conversation Collector]
+    Collector --&gt; Extractor[Background LLM Extractor &amp; Consolidator]
+    Extractor --&gt; SemanticMem[Semantic Memory&lt;br/&gt;Facts &amp; User Profile]
+    Extractor --&gt; EpisodicMem[Episodic Memory&lt;br/&gt;Past Task Summaries]
+    Extractor --&gt; ProceduralMem[Procedural Memory&lt;br/&gt;Rules &amp; System Directives]
+    SemanticMem &amp; EpisodicMem &amp; ProceduralMem --&gt; BaseStore[(LangGraph BaseStore / Persistent DB)]
+    BaseStore --&gt; Tools[Hot-Path Recall &amp; Manage Tools]
+    Tools --&gt; Agent[LangGraph Agent Graph]
+</code></pre>
+<h2>Cognitive Memory Primitives</h2>
+<p>LangMem structures agent memory into three primary operational categories:</p>
+<ol>
+<li><strong>Semantic Memory (User &amp; World Knowledge)</strong>:
+<ul>
+<li>Maintains continuous profiles of users, preferences, and factual constraints.</li>
+<li>Updates dynamically as conversations progress, combining new information with prior records.</li>
+</ul>
+</li>
+<li><strong>Episodic Memory (Past Experiences)</strong>:
+<ul>
+<li>Summarizes and indexes completed threads, debugging sessions, and tasks.</li>
+<li>Allows agents to recall how past problems were solved or past decisions were justified.</li>
+</ul>
+</li>
+<li><strong>Procedural Memory (Behavioral &amp; Prompt Adaptation)</strong>:
+<ul>
+<li>Automatically refines system prompts, instructions, and behavioral guidelines based on feedback or error corrections.</li>
+</ul>
+</li>
+</ol>
+<h2>Key Characteristics</h2>
+<ul>
+<li><strong>LangGraph Native</strong>: Built to leverage LangGraph's persistent state and storage primitives (<code>BaseStore</code>), running seamlessly with PostgreSQL, SQLite, or in-memory stores.</li>
+<li><strong>Background &amp; Hot-Path Modes</strong>: Supports both real-time &quot;hot path&quot; memory tool invocations by the agent and asynchronous background memory extraction routines that run after a conversation completes.</li>
+<li><strong>Pluggable &amp; Model Agnostic</strong>: Works with any LLM provider (OpenAI, Anthropic, Gemini, Ollama) and custom embedding models.</li>
+<li><strong>Open Source</strong>: Licensed permissively under MIT and fully runnable locally without external SaaS dependencies.</li>
+</ul>
+<h2>Python Quickstart</h2>
+<p>Install LangMem:</p>
+<pre><code class="language-bash">pip install -U langmem
+</code></pre>
+<p>Example usage extracting and retrieving user facts:</p>
+<pre><code class="language-python">from langmem import create_memory_store, create_memory_manager
+
+# 1. Create a memory store instance
+store = create_memory_store()
+
+# 2. Create memory manager configured for semantic extraction
+manager = create_memory_manager(
+    &quot;anthropic:claude-3-5-sonnet-latest&quot;,
+    store=store,
+    namespace=(&quot;users&quot;, &quot;user_42&quot;, &quot;memories&quot;)
+)
+
+# 3. Process conversation turns and extract facts
+conversation = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;I live in Berlin and always test using pytest.&quot;},
+    {&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: &quot;Understood! I'll use pytest for your tests.&quot;}
+]
+manager.invoke(conversation)
+
+# 4. Search extracted memories
+memories = store.search((&quot;users&quot;, &quot;user_42&quot;, &quot;memories&quot;), query=&quot;testing framework&quot;)
+for mem in memories:
+    print(mem.value)
+</code></pre>
+<h2>Related Concepts</h2>
+<ul>
+<li><a href="memory.html">LLM and Agent Memory</a> - Foundational agent memory concepts and cognitive taxonomy.</li>
+<li><a href="mem0.html">Mem0</a> - Vector-first persistent memory layer.</li>
+<li><a href="letta.html">Letta</a> - Stateful agent framework with hierarchical memory.</li>
+<li><a href="graphiti.html">Graphiti and Zep</a> - Temporal knowledge graph engine for agent memory.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supermemory</title>
+</head>
+<body>
+<h1>Supermemory</h1>
+<p>Supermemory is an open-source &quot;second brain&quot; and memory engine designed to provide AI agents and human users with persistent context across applications. It connects diverse information sources (such as bookmarks, browser history, Google Drive, Notion, Slack, and GitHub) and synthesizes them into an intelligent context layer accessible via the Model Context Protocol (MCP), REST APIs, and client extensions.</p>
+<pre><code class="language-mermaid">graph LR
+    subgraph &quot;External Integrations&quot;
+        Web[Browser / Bookmarks]
+        Docs[Notion / Google Drive]
+        Chat[Slack / GitHub]
+    end
+
+    Web &amp; Docs &amp; Chat --&gt; Ingestion[Supermemory Sync Engine]
+    Ingestion --&gt; KG[Knowledge Graph &amp; Vector Index]
+    KG --&gt; MCP[Supermemory MCP Server]
+    MCP --&gt; Agent[AI Agent / Claude / ChatGPT / Cursor]
+</code></pre>
+<h2>Key Characteristics</h2>
+<ul>
+<li><strong>Multi-Source Connectors</strong>: Automatically ingests and indexes bookmarks, web pages, notes, and documents into a unified semantic space.</li>
+<li><strong>Model Context Protocol (MCP) Support</strong>: Offers a native MCP server, enabling local and cloud LLM tools (Claude Desktop, Cursor, OpenClaw) to query user memory seamlessly.</li>
+<li><strong>Hybrid Retrieval Engine</strong>: Combines knowledge graph relationships, user profile attributes, and dense vector search for fast, relevant context retrieval.</li>
+<li><strong>Local &amp; Self-Hostable</strong>: The complete Supermemory stack is open source (TypeScript/Next.js/Postgres) and can be deployed locally using Docker or self-hosted servers.</li>
+</ul>
+<h2>Quickstart via MCP</h2>
+<p>Configure Supermemory in your MCP client settings:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;supermemory&quot;: {
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@supermemory/mcp-server&quot;],
+      &quot;env&quot;: {
+        &quot;SUPERMEMORY_API_KEY&quot;: &quot;your-api-key&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<h2>Related Concepts</h2>
+<ul>
+<li><a href="memory.html">LLM and Agent Memory</a> - Foundational agent memory concepts and taxonomy.</li>
+<li><a href="memory-store.html">Memory Store (Julep)</a> - Multi-tool cognitive memory platform with MCP support.</li>
+<li><a href="mem0.html">Mem0</a> - Vector-first persistent memory layer.</li>
+<li><a href="cmem.html">Claude-Mem (cmem.ai)</a> - Persistent memory stream for coding workflows.</li>
+</ul>
+</body>
+</html>

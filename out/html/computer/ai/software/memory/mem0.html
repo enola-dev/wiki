@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mem0</title>
+</head>
+<body>
+<h1>Mem0</h1>
+<p>Mem0 (formerly Embedchain) is an open-source intelligent memory layer designed to provide personalized, persistent long-term memory for AI agents, assistants, and applications. It continuously extracts, refines, and deduplicates user preferences, session history, and agent state across conversations, enabling models to adapt dynamically to individual users over time.</p>
+<pre><code class="language-mermaid">graph TD
+    Interaction[User Conversation / Message] --&gt; Mem0[Mem0 Engine]
+    Mem0 --&gt; Extractor[Fact &amp; Preference Extraction]
+    Extractor --&gt; Deduplication[Deduplication &amp; Conflict Resolution]
+    Deduplication --&gt; Store[(Memory Store&lt;br/&gt;User / Agent / Session Levels)]
+    Store --&gt; Search[Semantic &amp; Filtered Search]
+    Search --&gt; PromptInjection[Prompt Context Augmentation]
+</code></pre>
+<h2>Key Characteristics</h2>
+<ul>
+<li><strong>Multi-Level Memory Hierarchy</strong>: Separates memory scoping into:
+<ul>
+<li><strong>User Level</strong>: Long-term preferences, habits, and personal facts that persist across all conversations.</li>
+<li><strong>Agent Level</strong>: Agent persona, instructions, and learned execution patterns.</li>
+<li><strong>Session / Run Level</strong>: Short-to-medium term context bounded by a specific task or conversation thread.</li>
+</ul>
+</li>
+<li><strong>Adaptive Fact Extraction</strong>: Uses background LLM reasoning to detect new facts, resolve contradictions with prior memories, and update existing entries rather than appending duplicate chunks.</li>
+<li><strong>Open Source &amp; Local Execution</strong>: Can run as an in-process Python/TypeScript library with local vector stores (ChromaDB, Qdrant, SQLite) or via a self-hosted Docker server with a REST API.</li>
+<li><strong>Managed Cloud Offering</strong>: Mem0 also offers a hosted SaaS platform for enterprise deployments with multi-tenancy and telemetry.</li>
+</ul>
+<h2>Python Quickstart</h2>
+<p>Mem0 can be installed via <code>pip install mem0ai</code>:</p>
+<pre><code class="language-python">from mem0 import Memory
+
+# 1. Initialize local memory instance
+config = {
+    &quot;vector_store&quot;: {
+        &quot;provider&quot;: &quot;qdrant&quot;,
+        &quot;config&quot;: {&quot;path&quot;: &quot;/tmp/qdrant&quot;}
+    }
+}
+memory = Memory.from_config(config)
+
+# 2. Add memories from conversation turns
+memory.add(
+    &quot;I prefer working with Python and async/await over synchronous code.&quot;,
+    user_id=&quot;user_123&quot;,
+    metadata={&quot;category&quot;: &quot;coding_preferences&quot;}
+)
+
+# 3. Retrieve relevant memories during a new conversation
+relevant = memory.search(
+    &quot;How should I structure the backend service?&quot;,
+    user_id=&quot;user_123&quot;
+)
+for entry in relevant:
+    print(f&quot;Recalled: {entry['memory']}&quot;)
+</code></pre>
+<h2>Supported Vector Stores</h2>
+<p>Mem0 supports a pluggable vector database architecture:</p>
+<ul>
+<li><strong>Local / Embedded</strong>: Qdrant (local), ChromaDB, LanceDB, SQLite.</li>
+<li><strong>Cloud / Distributed</strong>: Qdrant Cloud, Pinecone, Milvus, PostgreSQL (<code>pgvector</code>), Redis, OpenSearch.</li>
+</ul>
+<h2>Related Concepts</h2>
+<ul>
+<li><a href="memory.html">LLM and Agent Memory</a> - Foundational agent memory concepts and taxonomy.</li>
+<li><a href="supermemory.html">Supermemory</a> - Context engine and second-brain platform with MCP support.</li>
+<li><a href="langmem.html">LangMem</a> - LangChain SDK for semantic and episodic memory management.</li>
+<li><a href="cmem.html">Claude-Mem (cmem.ai)</a> - Persistent memory layer optimized for coding workflows.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cognee</title>
+</head>
+<body>
+<h1>Cognee</h1>
+<p>Cognee is an open-source memory engine for AI applications and agents that organizes data into interconnected, topological knowledge graphs and vector embeddings. It bridges the gap between unstructured data ingestion and high-precision retrieval by transforming documents, conversations, and code into structured relational graphs enriched with semantic vectors.</p>
+<pre><code class="language-mermaid">graph LR
+    Input[Unstructured Data / Transcripts / Docs] --&gt; Add[&quot;cognee.add()&quot;]
+    Add --&gt; Cognify[&quot;cognee.cognify()&lt;br/&gt;(LLM Extraction &amp; Graph Construction)&quot;]
+    Cognify --&gt; GraphStore[(Graph DB: Neo4j / NetworkX / Kùzu)]
+    Cognify --&gt; VectorStore[(Vector DB: Qdrant / LanceDB / PGVector)]
+    GraphStore &amp; VectorStore --&gt; Search[&quot;cognee.search()&lt;br/&gt;(Hybrid / Multi-hop Recall)&quot;]
+    Search --&gt; Agent[AI Agent / LLM]
+</code></pre>
+<h2>Key Characteristics</h2>
+<ul>
+<li><strong>Topological Knowledge Graphs</strong>: Transforms raw inputs into nodes and edges representing entities and relations, enabling multi-hop associative queries that pure vector similarity searches miss.</li>
+<li><strong>Local &amp; Self-Hostable</strong>: Can run completely locally using embedded engines like SQLite, NetworkX, and LanceDB, or scale to production using Neo4j, Qdrant, and PostgreSQL (<code>pgvector</code>).</li>
+<li><strong>Deterministic Pipeline</strong>: Provides explicit control over data ingestion (<code>add</code>), graph cognition (<code>cognify</code>), and semantic/graph querying (<code>search</code>).</li>
+<li><strong>Multi-Modal Support</strong>: Processes PDFs, audio files, GitHub repositories, and tabular data into uniform cognitive graphs.</li>
+</ul>
+<h2>Core API Workflow</h2>
+<p>Cognee exposes a Python API structured around three main operations:</p>
+<pre><code class="language-python">import asyncio
+import cognee
+
+async def main():
+    # 1. Add raw text, files, or datasets to the memory pipeline
+    await cognee.add(&quot;Alice is the lead architect for the Orion project based in Zurich.&quot;)
+    await cognee.add(&quot;The Orion project uses Rust and Apache Arrow for memory efficiency.&quot;)
+
+    # 2. Cognify: Extract entities, resolve relationships, and construct graph embeddings
+    await cognee.cognify()
+
+    # 3. Search: Retrieve structured memory context
+    results = await cognee.search(&quot;What technologies does Alice's project rely on?&quot;)
+    for result in results:
+        print(result)
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main())
+</code></pre>
+<h2>Supported Storage Backends</h2>
+<p>| Component | Embedded / Local | Production / Distributed |
+| :--- | :--- | :--- |
+| <strong>Relational DB</strong> | SQLite | PostgreSQL |
+| <strong>Graph DB</strong> | NetworkX, Kùzu | Neo4j, FalkorDB |
+| <strong>Vector DB</strong> | LanceDB, ChromaDB | Qdrant, Milvus, pgvector |</p>
+<h2>Related Concepts</h2>
+<ul>
+<li><a href="memory.html">LLM and Agent Memory</a> - Overview of AI agent memory architectures.</li>
+<li><a href="graphiti.html">Graphiti and Zep</a> - Temporal knowledge graph engine for dynamic conversational memory.</li>
+<li><a href="hipporag.html">HippoRAG</a> - Neurobiologically inspired knowledge graph retrieval with PageRank.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude-Mem (cmem.ai)</title>
+</head>
+<body>
+<h1>Claude-Mem (cmem.ai)</h1>
+<p>Claude-Mem (<code>cmem.ai</code>) is an open-source persistent memory system and context stream designed specifically for terminal coding agents and AI workflows, such as Claude Code, OpenClaw, and cursor-based environments. It captures tool executions, user decisions, file edits, and architectural constraints across development sessions, compressing and injecting relevant memories back into future agent turns.</p>
+<pre><code class="language-mermaid">graph LR
+    subgraph &quot;Coding Session&quot;
+        Terminal[CLI / OpenClaw / Claude Code] --&gt; ToolExec[Tool Calls &amp; Code Edits]
+    end
+
+    ToolExec --&gt; Extraction[CMEM Observation Extractor]
+    Extraction --&gt; PrivacyFilter[&quot;Privacy Redactor (&amp;lt;private&amp;gt; Tags)&quot;]
+    PrivacyFilter --&gt; LocalStore[(Local SQLite / Markdown Memory)]
+    LocalStore &lt;--&gt; Sync[CMEM Cloud Sync]
+    LocalStore --&gt; PromptInjection[Context Injection into Next Agent Session]
+</code></pre>
+<h2>Key Characteristics</h2>
+<ul>
+<li><strong>Agent Workflow Continuity</strong>: Eliminates the &quot;cold start&quot; penalty across development sessions by recording project conventions, debugging steps, and dependency decisions.</li>
+<li><strong>Privacy Controls</strong>: Supports <code>&lt;private&gt;</code> markup tags in prompts and files to explicitly omit credentials, tokens, or sensitive context from persistent memory storage.</li>
+<li><strong>Two-Tier Architecture (Local + Cloud)</strong>:
+<ul>
+<li><strong>Local Mode (OSS)</strong>: Operates completely offline with local SQLite storage, zero external data leaks, and local embedding support.</li>
+<li><strong>CMEM Cloud (<code>cmem.ai</code>)</strong>: Multi-device real-time sync, web viewer dashboard for memory stream inspection, and private Model Context Protocol (MCP) server endpoints.</li>
+</ul>
+</li>
+<li><strong>Native OpenClaw &amp; Claude Code Support</strong>: Provides ready-to-run installation scripts (<code>openclaw.sh</code>, <code>npx claude-mem install</code>) and hook integrations for terminal agent frameworks.</li>
+</ul>
+<h2>Installation &amp; Setup</h2>
+<p>Install locally via <code>npx</code>:</p>
+<pre><code class="language-bash">npx claude-mem install
+</code></pre>
+<p>Or configure via OpenClaw plugin:</p>
+<pre><code class="language-bash">curl -fsSL https://cmem.ai/openclaw.sh | bash
+</code></pre>
+<h2>CLI Usage &amp; Commands</h2>
+<p>Claude-Mem exposes simple commands to view, search, and manage stored context:</p>
+<pre><code class="language-bash"># Check memory health and stored record count
+cmem status
+
+# Search memory for past architectural decisions
+cmem search &quot;authentication architecture&quot;
+
+# Manually record a project rule or preference
+cmem remember &quot;Always run nix-shell before executing python tests&quot;
+</code></pre>
+<h2>Related Concepts</h2>
+<ul>
+<li><a href="memory.html">LLM and Agent Memory</a> - Overview of AI agent memory architectures.</li>
+<li><a href="memory-store.html">Memory Store (Julep)</a> - Multi-tool cognitive memory platform with MCP support.</li>
+<li><a href="mem0.html">Mem0</a> - Vector-first memory layer for assistants.</li>
+<li><a href="hermes-memory-providers.html">Hermes Agent Memory Providers</a> - Pluggable memory backends in Hermes Agent.</li>
+</ul>
+</body>
+</html>

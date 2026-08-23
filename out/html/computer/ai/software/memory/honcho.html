@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Honcho</title>
+</head>
+<body>
+<h1>Honcho</h1>
+<p>Honcho is an open-source, AI-native memory and user-modeling platform created by Plastic Labs. Unlike standard vector databases that perform simple semantic chunk matching, Honcho focuses on &quot;natural language plasticity&quot; and dialectic reasoning—building evolving, high-fidelity representations of user and agent identities, psychological traits, and cognitive state over long time horizons.</p>
+<pre><code class="language-mermaid">graph TD
+    Interaction[Conversation Turn / Session] --&gt; Honcho[Honcho Core Engine]
+    Honcho --&gt; DialecticReasoning[Dialectic Reasoning &amp; Fact Synthesis]
+    DialecticReasoning --&gt; UserModel[Dynamic User Representation &amp; Theory of Mind]
+    DialecticReasoning --&gt; AgentModel[Agent Persona &amp; Memory Workspace]
+    UserModel &amp; AgentModel --&gt; Storage[(Honcho Store / SQLite / Postgres)]
+    Storage --&gt; Prefetch[Pre-turn Context Prefetching]
+    Prefetch --&gt; Agent[LLM Agent Execution Loop]
+</code></pre>
+<h2>Key Characteristics</h2>
+<ul>
+<li><strong>Dialectic Reasoning &amp; User Modeling</strong>: Synthesizes nuanced user profiles, working hypotheses, and communication styles rather than storing raw text strings.</li>
+<li><strong>Natural Language Plasticity</strong>: Dynamically refines and consolidates context across multiple sessions, allowing the agent to continuously adapt without bloating token budgets.</li>
+<li><strong>Hermes Agent &amp; OpenClaw Integration</strong>: Supported natively as an external memory provider in autonomous agent runtimes like <a href="hermes-memory-providers.html">Hermes Agent Memory Providers</a> and Claude Code setups.</li>
+<li><strong>Self-Hostable &amp; Managed SaaS</strong>:
+<ul>
+<li><strong>Open Source</strong>: The core Honcho server and Python SDK (<code>plastic-labs/honcho</code>) can be run locally using Docker and relational databases.</li>
+<li><strong>Honcho Cloud (<code>api.honcho.dev</code>)</strong>: Hosted multi-tenant platform for production agent deployments.</li>
+</ul>
+</li>
+</ul>
+<h2>Integration Architecture</h2>
+<p>Honcho operates on a session and workspace model:</p>
+<pre><code class="language-python">from honcho import Honcho
+
+# 1. Initialize Honcho client (local or cloud)
+client = Honcho(base_url=&quot;http://localhost:8000&quot;)
+
+# 2. Register user session and message turns
+session = client.sessions.get_or_create(session_id=&quot;session_01&quot;, user_id=&quot;user_alice&quot;)
+session.add_message(role=&quot;user&quot;, content=&quot;I am building a high-throughput telemetry agent in Go.&quot;)
+
+# 3. Query peer representation and context
+context = session.get_context(query=&quot;What programming language is Alice focusing on?&quot;)
+print(&quot;Prefetched context:&quot;, context)
+</code></pre>
+<h2>Related Concepts</h2>
+<ul>
+<li><a href="memory.html">LLM and Agent Memory</a> - Foundational agent memory concepts and cognitive taxonomy.</li>
+<li><a href="hermes-memory-providers.html">Hermes Agent Memory Providers</a> - Overview of memory providers in Hermes Agent.</li>
+<li><a href="letta.html">Letta</a> - Stateful agent framework with self-editing core memory.</li>
+<li><a href="mem0.html">Mem0</a> - Personalized memory layer with multi-level scoping.</li>
+</ul>
+</body>
+</html>

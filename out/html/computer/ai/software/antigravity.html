@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Antigravity</title>
+</head>
+<body>
+<h1>Google Antigravity</h1>
+<p>Google Antigravity is an AI-first software development platform and agentic coding environment comprising a desktop application, IDE extensions, and the <code>agy</code> command-line interface.</p>
+<h2>Permissions &amp; Security Architecture</h2>
+<p>Antigravity operates a unified, fine-grained permissions engine formatted as <code>action(target)</code> (such as <code>read_url(*)</code>, <code>command(git)</code>, or <code>write_file(src/)</code>). Operations are evaluated across three priority tiers: <strong>Deny &gt; Ask &gt; Allow</strong>.</p>
+<h3>Configuration Scopes</h3>
+<p>When managing permissions (via the <code>/permissions</code> interactive TUI in <code>agy</code> or the settings panel), permissions are split into three distinct scopes:</p>
+<ol>
+<li><strong>Project Scope</strong>: Rules that apply exclusively when operating within a specific project/repository.</li>
+<li><strong>Shared Scope</strong>: Rules shared across all Antigravity surfaces on the machine (IDE, Desktop App, and CLI).</li>
+<li><strong>Global Scope</strong>: Rules applied across all sessions for the <code>agy</code> CLI.</li>
+</ol>
+<h3>Storage Locations on Disk</h3>
+<p>| Scope | Location on Disk | Description |
+| :--- | :--- | :--- |
+| <strong>Project Permissions</strong> | <code>~/.gemini/config/projects/&lt;project-uuid&gt;.json</code> | Project-scoped permission grants and trusted settings, keyed to the local repository directory path. |
+| <strong>Global CLI Settings</strong> | <code>~/.gemini/antigravity-cli/settings.json</code> | User-level global settings and global permission grants. |
+| <strong>Shared Antigravity Config</strong> | <code>~/.gemini/config/</code> / <code>~/.gemini/antigravity/</code> | Cross-surface preferences and shared state. |</p>
+<h3>Repository-Level vs. Local Security Isolation</h3>
+<p>Project permissions <strong>cannot</strong> be defined or committed directly within the Git repository folder itself (such as a checked-in <code>.antigravity/permissions.json</code>).</p>
+<p>This design is a deliberate security boundary:</p>
+<ul>
+<li><strong>Preventing Repo-Level Privilege Escalation</strong>: If repositories could declare their own permission bypasses or auto-approval rules in checked-in files, cloning an untrusted or malicious third-party repository could lead to arbitrary command execution, network exfiltration, or local file compromises without user consent.</li>
+<li><strong>Separation of Capabilities and Authorization</strong>: Collaborative assets such as custom agent instructions, rules, workflows, and tools are shared via the repository (in <code>AGENTS.md</code>, <code>GEMINI.md</code>, and <code>.agents/</code>), while actual permission authorizations remain strictly under the developer's local user-level control.</li>
+</ul>
+</body>
+</html>

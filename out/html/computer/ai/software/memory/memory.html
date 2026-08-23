@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM and Agent Memory</title>
+</head>
+<body>
+<h1>LLM and Agent Memory</h1>
+<p>LLM and Agent Memory refers to the software architectures, data structures, and algorithms that provide Large Language Model (LLM) agents with persistent, stateful, and adaptive context across interactions and time. While standard foundation models are stateless between API calls and traditional Retrieval-Augmented Generation (RAG) focuses on static document retrieval, agent memory systems enable continuous learning, self-updating user profiles, episodic recall, and procedural skill acquisition.</p>
+<pre><code class="language-mermaid">graph TD
+    User([User / Environment]) &lt;--&gt; Agent[LLM Agent Core]
+    Agent &lt;--&gt; WM[Working Memory / Context Window]
+    Agent &lt;--&gt; Engine[Memory Management Engine]
+
+    subgraph &quot;Persistent Cognitive Memory Layer&quot;
+        Engine &lt;--&gt; Episodic[Episodic Memory&lt;br/&gt;Past interactions, events, timelines]
+        Engine &lt;--&gt; Semantic[Semantic Memory&lt;br/&gt;Facts, entities, preferences, world models]
+        Engine &lt;--&gt; Procedural[Procedural Memory&lt;br/&gt;Skills, execution rules, playbooks]
+    end
+
+    subgraph &quot;Storage &amp; Indexing Substrates&quot;
+        Episodic --- VectorDB[(Vector Store / Chunks)]
+        Semantic --- GraphDB[(Knowledge Graph / Triples)]
+        Procedural --- DocStore[(Markdown / Structured Stores)]
+    end
+</code></pre>
+<h2>Core Cognitive Memory Taxonomy</h2>
+<p>Modern AI memory systems adopt cognitive psychology classifications to structure long-term agent state:</p>
+<h3>1. Working Memory (Short-Term / In-Context)</h3>
+<ul>
+<li><strong>Definition</strong>: The active context window of the LLM containing the immediate prompt, recent conversational turns, tool call outputs, and scratchpad reasoning.</li>
+<li><strong>Characteristics</strong>: Fast, volatile, strictly bounded by the model's maximum context length and attention budget.</li>
+</ul>
+<h3>2. Episodic Memory (Events &amp; Experiences)</h3>
+<ul>
+<li><strong>Definition</strong>: Temporal records of past events, conversations, user interactions, and multi-step task executions (&quot;what happened, when, and how&quot;).</li>
+<li><strong>Characteristics</strong>: Time-stamped, append-heavy, often compressed or summarized periodically to preserve long-range experiential history.</li>
+</ul>
+<h3>3. Semantic Memory (Facts &amp; Knowledge)</h3>
+<ul>
+<li><strong>Definition</strong>: Discrete, factual knowledge about users, organizations, codebases, and domain concepts (&quot;what is true&quot;).</li>
+<li><strong>Characteristics</strong>: Extracted and synthesized from episodic events; subject to continuous updating, deduplication, and contradiction resolution.</li>
+</ul>
+<h3>4. Procedural Memory (Skills &amp; Rules)</h3>
+<ul>
+<li><strong>Definition</strong>: How-to knowledge, behavioral guidelines, playbooks, prompts, and learned tool execution patterns (&quot;how to act&quot;).</li>
+<li><strong>Characteristics</strong>: Iteratively refined through feedback loops, error corrections, and reinforcement.</li>
+</ul>
+<hr />
+<h2>Architectural Paradigms</h2>
+<p>Agent memory architectures have evolved into several distinct design patterns:</p>
+<p>| Paradigm | Description | Representative Systems | Strengths | Trade-offs |
+| :--- | :--- | :--- | :--- | :--- |
+| <strong>Flat Markdown &amp; File Memory</strong> | Memory stored in human-readable Markdown files (<code>MEMORY.md</code>, <code>USER.md</code>) with lightweight embeddings. | <a href="cmem.html">Claude-Mem (cmem.ai)</a>, <a href="hermes-memory-providers.html">Hermes Agent Memory Providers</a>, OpenClaw | Inspectable, versionable with Git, transparent. | Limited multi-hop relational reasoning. |
+| <strong>Fact-Extraction &amp; Vector Layers</strong> | Automated LLM extraction of atomic facts into vector databases with decay and reflection. | <a href="mem0.html">Mem0</a>, <a href="supermemory.html">Supermemory</a>, <a href="langmem.html">LangMem</a> | Fast semantic search, automatic deduplication, easy integration. | Weak temporal invalidation and relational joins. |
+| <strong>LLM-as-an-OS (Virtual Paging)</strong> | Hierarchical memory tiers (Core, Archival, Recall) actively managed by the LLM via tool calls. | <a href="letta.html">Letta</a> | Self-editing memory, explicit memory control by the agent. | Higher LLM token overhead during paging operations. |
+| <strong>Temporal Knowledge Graphs</strong> | Knowledge graphs linking entities, relationships, and temporal validities with hybrid search. | <a href="graphiti.html">Graphiti and Zep</a>, <a href="cognee.html">Cognee</a>, <a href="hipporag.html">HippoRAG</a> | Multi-hop reasoning, temporal fact invalidation, structured context. | Graph construction latency and schema complexity. |
+| <strong>Cognitive Databases &amp; MCP</strong> | Shared memory infrastructure exposed to agents via the Model Context Protocol (MCP) or APIs. | <a href="memory-store.html">Memory Store (Julep)</a>, <a href="honcho.html">Honcho</a> | Cross-tool interoperability, team-wide context sharing. | Requires network infrastructure and multi-agent coordination. |</p>
+<hr />
+<h2>Memory vs. Traditional RAG</h2>
+<p>| Dimension | Traditional RAG | Agent Memory Systems |
+| :--- | :--- | :--- |
+| <strong>Data Flow</strong> | Read-only (one-way retrieval from external corpora) | Read-Write (bidirectional continuous extraction, storage, and recall) |
+| <strong>Lifecycle</strong> | Static documents indexed in advance | Dynamic, self-improving, updated after each conversation or task turn |
+| <strong>Focus</strong> | Document chunk matching via semantic similarity | Entity relationships, user identity, temporal awareness, and behavioral adaptation |
+| <strong>Decay &amp; Update</strong> | Re-index entire corpus when documents change | Incremental extraction, entity resolution, and temporal invalidation |</p>
+<hr />
+<h2>Key Software and Implementations</h2>
+<p>The following systems implement LLM and agent memory across open-source and cloud environments:</p>
+<ul>
+<li><a href="cognee.html">Cognee</a>: Open-source topological memory engine combining knowledge graphs, vectors, and relational storage.</li>
+<li><a href="mem0.html">Mem0</a>: Open-source personalized memory layer with multi-level context extraction and vector search.</li>
+<li><a href="letta.html">Letta</a>: Stateful agent framework and LLM operating system featuring hierarchical self-editing memory.</li>
+<li><a href="graphiti.html">Graphiti and Zep</a>: Open-source temporal knowledge graph engine designed for dynamic agent memory and entity tracking.</li>
+<li><a href="cmem.html">Claude-Mem (cmem.ai)</a>: Persistent memory stream and context compressor tailored for coding agents like Claude Code and OpenClaw.</li>
+<li><a href="memory-store.html">Memory Store (Julep)</a>: Cognitive memory platform and company brain by Julep AI with Model Context Protocol (MCP) integration.</li>
+<li><a href="langmem.html">LangMem</a>: Long-term memory SDK by LangChain supporting semantic, episodic, and procedural memory extraction.</li>
+<li><a href="honcho.html">Honcho</a>: User modeling and natural language plasticity memory engine by Plastic Labs.</li>
+<li><a href="supermemory.html">Supermemory</a>: Open-source second brain and context engine connecting external data to LLMs via MCP.</li>
+<li><a href="hipporag.html">HippoRAG</a>: Neurobiologically inspired multi-hop memory framework using Personalized PageRank on knowledge graphs.</li>
+<li><a href="hermes-memory-providers.html">Hermes Agent Memory Providers</a>: Survey of external memory provider plugins in Hermes Agent (OpenViking, Holographic HRR, Hindsight, RetainDB, ByteRover).</li>
+</ul>
+</body>
+</html>

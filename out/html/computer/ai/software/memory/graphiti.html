@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graphiti and Zep</title>
+</head>
+<body>
+<h1>Graphiti and Zep</h1>
+<p>Graphiti is an open-source temporal knowledge graph engine designed specifically for building dynamic, persistent memory for AI agents, while Zep is a managed enterprise platform built on top of Graphiti. Graphiti addresses the limitation of traditional RAG and static knowledge graphs by continuously tracking entities, relationships, and facts as they change over time, automatically invalidating stale facts while preserving historical context.</p>
+<pre><code class="language-mermaid">graph LR
+    Message[New Interaction / Fact] --&gt; Ingest[Graphiti Ingestion Pipeline]
+    Ingest --&gt; EntityExtractor[Entity &amp; Relation Extractor]
+    EntityExtractor --&gt; TemporalGraph[(Temporal Knowledge Graph&lt;br/&gt;Entities + Directed Edges + Timestamps)]
+    TemporalGraph --&gt; Invalidation[Edge Invalidation &amp; Versioning]
+    TemporalGraph --&gt; RetrievalEngine[Hybrid Retrieval Engine&lt;br/&gt;Vector + BM25 + Graph Traversal]
+    RetrievalEngine --&gt; Agent[AI Agent]
+</code></pre>
+<h2>Key Characteristics</h2>
+<ul>
+<li><strong>Temporal Edge Modeling</strong>: Facts in Graphiti are modeled as directed edges between entity nodes with <code>valid_at</code>, <code>invalid_at</code>, and timestamp metadata. When a user changes their preference (e.g. &quot;I switched from Python to Rust&quot;), Graphiti marks the prior edge invalid without deleting the historical fact.</li>
+<li><strong>Bi-Temporal Tracking</strong>: Distinguishes between when an event occurred in the real world and when the system learned about it.</li>
+<li><strong>Hybrid Retrieval</strong>: Combines semantic vector similarity, full-text BM25 search, and multi-hop graph traversal to resolve complex entity queries.</li>
+<li><strong>Open-Source Core &amp; Cloud Engine</strong>:
+<ul>
+<li><strong>Graphiti (OSS)</strong>: Fully self-hostable Python library with backends for Neo4j, FalkorDB, and Amazon Neptune.</li>
+<li><strong>Zep (Managed)</strong>: Cloud platform offering low-latency memory APIs, user session management, and framework integrations for production applications.</li>
+</ul>
+</li>
+</ul>
+<h2>Python Quickstart</h2>
+<pre><code class="language-python">import asyncio
+from graphiti_core import Graphiti
+from graphiti_core.nodes import EntityNode
+
+async def main():
+    # Initialize Graphiti connected to a graph database
+    graphiti = Graphiti(&quot;neo4j://localhost:7687&quot;, auth=(&quot;neo4j&quot;, &quot;password&quot;))
+
+    # Ingest conversational episode
+    await graphiti.add_episode(
+        name=&quot;Meeting with Bob&quot;,
+        episode_body=&quot;Bob announced that Project Titan is moving from AWS to GCP starting in September.&quot;,
+        source_description=&quot;Slack conversation&quot;
+    )
+
+    # Search the temporal graph
+    results = await graphiti.search(&quot;Where is Project Titan hosted?&quot;)
+    for edge in results:
+        print(f&quot;{edge.source.name} -&gt; {edge.name} -&gt; {edge.target.name} (Valid: {edge.valid_at})&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    asyncio.run(main())
+</code></pre>
+<h2>Framework Integrations</h2>
+<p>Graphiti and Zep natively integrate with popular agent orchestration frameworks:</p>
+<ul>
+<li><strong>LangChain / LangGraph</strong>: Provides state stores and memory providers for LangGraph graphs.</li>
+<li><strong>CrewAI &amp; AutoGen</strong>: Pluggable agent memory layers for multi-agent collaboration.</li>
+<li><strong>LlamaIndex</strong>: Graph index store for temporal querying.</li>
+</ul>
+<h2>Related Concepts</h2>
+<ul>
+<li><a href="memory.html">LLM and Agent Memory</a> - Foundational agent memory concepts and taxonomy.</li>
+<li><a href="cognee.html">Cognee</a> - Topological knowledge graph memory engine.</li>
+<li><a href="hipporag.html">HippoRAG</a> - Graph memory using Personalized PageRank.</li>
+<li><a href="letta.html">Letta</a> - Stateful agent framework with hierarchical memory.</li>
+</ul>
+</body>
+</html>
