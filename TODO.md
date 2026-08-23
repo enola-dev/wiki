@@ -23,8 +23,6 @@
 
 - [ ] `okf generate index` command to auto-generate `index.md` files for all subdirectories, with a list of all `.md` files in that directory, and a link to the parent directory.
 
-- [ ] Implement a Java MD parser extension plugin for https://docs.enola.dev/specs/markdown-magic-link, and write a generator that converts our MD to MD with the magic links resolved.
-
 - [ ] `wiki generate broken` to auto-generate a `BROKEN.md` file with a list of all broken links in the repo, and a link to the source files.
 
 - [ ] `todo generate` command to auto-generate a TODO.md file with `- [ ]` items from all `.md` files in the repo, and a link to the source file.
