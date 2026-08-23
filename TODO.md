@@ -1,6 +1,9 @@
 # ToDo
 
-- [x] Validate if `/people/vorburger.ch.md` matches the spec described in AGENTS.md, and if not, fix it.
+- [ ] Figure out how to configure Antigravity, or use another Harness, to prompt Wiki updates - without constantly:
+  - asking for permission to access each external website
+  - skip proposing an Implementation plan
+  - how to save this, and then permission to run `bin/wiki-lint` inside this repo
 
 - [ ] Find, or write, a command line AI harness runner (`agy`, with policy?) which can run our`/wiki-maintenance` skill once a week or whatever (without prompts, yet safe)
 

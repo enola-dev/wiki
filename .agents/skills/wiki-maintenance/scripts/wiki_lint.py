@@ -209,8 +209,9 @@ class WikiLinter:
                         modified_fm = True
                         self.log_fixed(file_path, "Removed redundant 'status: stable' from frontmatter")
 
-        # 2. Heading Structure Validation
-        h1_matches = list(H1_HEADING_REGEX.finditer(body))
+        # 2. Heading Structure Validation (ignore code blocks)
+        body_no_code = re.sub(r"```[\s\S]*?```", "", body)
+        h1_matches = list(H1_HEADING_REGEX.finditer(body_no_code))
         if not h1_matches:
             self.log_error(file_path, "Document body missing required level-1 heading (# Title)")
             if self.fix:

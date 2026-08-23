@@ -9,10 +9,13 @@ This skill provides comprehensive validation and remediation procedures for main
 
 ## Quick Start / Automated Execution
 
-To audit or automatically repair all documents under `docs/`, use the bundled helper script:
+To audit or automatically repair all documents under `docs/`, use the bundled helper script or convenience wrapper:
 
 ```bash
 # Check compliance (returns non-zero exit code if violations exist)
+bin/wiki-lint
+
+# Or directly via nix-shell:
 nix-shell -p python3 --run "python3 .agents/skills/wiki-maintenance/scripts/wiki_lint.py --check"
 
 # Automatically fix violations (missing frontmatter keys, illegal magic links, missing index.md, orphans)

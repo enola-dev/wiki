@@ -174,6 +174,7 @@ When answering user questions or conducting deep research:
 
 Periodically, or when touching related topics:
 
+- **Run Linter**: Execute `bin/wiki-lint` to validate all documents under `docs/` against frontmatter, link resolution, and structural conventions.
 - **Detect & Fix Dead Links**: Verify all `[[...]]` references resolve to valid files or URLs.
 - **Reconcile Contradictions**: When newer sources supersede older notes, update the stale documentation or explicitly note the paradigm shift.
 - **Eliminate Orphan Pages**: Ensure every page is reachable via category indexes and contextual cross-links.
