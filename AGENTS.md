@@ -40,7 +40,30 @@ docs/
 - Use lowercase alphanumeric characters and hyphens for slugs (`kebab-case`).
 - Name files descriptively after the core entity or concept (e.g., `vector-search.md`, `memory-architectures.md`).
 - Avoid spaces and special characters in file/folder names.
-- Use lowercase `index.md` NOT uppercase `INDEX.md`
+- Use lowercase `index.md` NOT uppercase `INDEX.md`.
+
+### Topic Lead Concepts & Directory Indexing
+
+When a directory focuses on an overarching topic or concept (such as `.../software/memory/`):
+
+1. **Lead Concept Document (`<dir>/<dir>.md`)**:
+   - The directory MAY contain a concept document named identically to the directory itself (e.g., `docs/.../memory/memory.md`).
+   - This document serves as the foundational **topic overview / architectural concept** (e.g. general principles, taxonomy, comparison tables) for that category, while sibling files describe specific implementations, libraries, or tools (e.g., `letta.md`, `graphiti.md`).
+2. **Index Presentation & Progressive Disclosure (`index.md`)**:
+   - In accordance with OKF §8, `index.md` files serve strictly as directory catalogs and contain no YAML frontmatter.
+   - When a matching `<dir>/<dir>.md` exists, its link and summary are placed as the **preamble** immediately below the `# <Category>` H1 heading:
+     ```markdown
+     # Memory
+
+     [[memory]] - LLM and Agent Memory refers to the software architectures, data structures, and algorithms...
+
+     ## Articles
+
+     - [[cmem]] - Claude-Mem is an open-source persistent memory system...
+     - [[letta]] - Letta is an open-source framework...
+     ```
+   - The lead concept (`[[memory]]`) is **omitted from the `## Articles` list** to avoid duplicate indexing.
+   - If no matching `<dir>/<dir>.md` exists, all articles in that directory are listed under `## Articles`.
 
 ---
 

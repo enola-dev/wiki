@@ -29,6 +29,7 @@ nix-shell -p python3 --run "python3 .agents/skills/wiki-maintenance/scripts/wiki
 When creating, editing, or reviewing documents under `docs/`, verify compliance against each of the following rules:
 
 ### 1. Directory Layout & Naming Conventions
+
 - **Path**: All wiki articles MUST reside under `docs/<domain>/<subdomain>/<topic>/...`.
 - **Slugs & Filenames**:
   - File and folder names MUST use lowercase alphanumeric characters and hyphens (`kebab-case`), or dot-separated domain/identity slugs (e.g., `vorburger.ch.md`).
@@ -36,6 +37,7 @@ When creating, editing, or reviewing documents under `docs/`, verify compliance 
   - Category and directory index files MUST be named lowercase `index.md` (NEVER `INDEX.md`).
 
 ### 2. Document Frontmatter (OKF & YAML-LD)
+
 Every `.md` file in `docs/` MUST start with a YAML frontmatter block enclosed by `---`:
 
 ```yaml
@@ -55,7 +57,8 @@ status: draft # Optional: draft | deprecated (omitted when stable)
 ```
 
 #### Frontmatter Rules:
-- **`type:` (MANDATORY)**: Must always be specified on every document (including `index.md`).
+
+- **`type:` (MANDATORY)**: Must always be specified on all concept documents (but not `index.md` files, which are reserved as special catalog files and carry no frontmatter).
 - **`title:` (FORBIDDEN)**: Do NOT include `title:` in frontmatter. The title is always inferred from the first `# ` H1 heading in the Markdown body.
 - **`description:` (FORBIDDEN)**: Do NOT include `description:` in frontmatter. The description is always inferred from the first paragraph in the Markdown body.
 - **`status:` (CONDITIONAL)**:
@@ -66,11 +69,13 @@ status: draft # Optional: draft | deprecated (omitted when stable)
 - **YAML-LD**: Linked data fields (such as `@context`, `schema:givenName`, etc.) can be placed directly in frontmatter.
 
 ### 3. Headings & Body Structure
+
 - **Title (H1)**: The first heading in the Markdown body MUST be a level-1 heading `# <Title>`.
 - **Single H1**: Prefer exactly one H1 per document; use `##`, `###`, etc. for sub-sections.
 - **Summary**: The first paragraph immediately following the H1 heading serves as the description/summary.
 
 ### 4. Markdown Magic Links Syntax (`[[...]]`)
+
 Use double square brackets `[[...]]` for inter-wiki links and external entity links:
 
 - **Automatic Title Extraction**: `[[vector-search]]` resolves the title from `vector-search.md`.
@@ -81,8 +86,10 @@ Use double square brackets `[[...]]` for inter-wiki links and external entity li
 - **External URLs**: `[[https://www.enola.dev]]` or standard markdown links `[Label](https://...)`.
 - **Link Integrity**: All relative magic links MUST resolve to existing `.md` or `index.md` files.
 
-### 5. Category Hierarchy & Orphan Prevention
-- **Directory Index**: Every directory containing sub-directories or markdown files MUST contain an `index.md`.
+### 5. Category Hierarchy, Lead Concepts & Orphan Prevention
+
+- **Directory Index (`index.md`)**: Every directory containing sub-directories or markdown files MUST contain an `index.md`.
+- **Topic Lead Concept (`<dir>/<dir>.md`)**: If a directory contains a concept document named identically to the directory itself (e.g., `memory/memory.md`), it serves as the overarching topic concept. In `index.md`, it is placed as the preamble immediately under the `# <Category>` heading and omitted from `## Articles`.
 - **Parent Index Links**: The `index.md` MUST list and link to all subcategories and sibling articles in that directory.
 - **No Orphan Pages**: Every page in the wiki must be discoverable and reachable from its parent `index.md` or a category overview.
 
@@ -91,6 +98,7 @@ Use double square brackets `[[...]]` for inter-wiki links and external entity li
 ## Violation Remediation Recipes
 
 ### Recipe A: Fix Frontmatter Keys
+
 ```diff
  ---
 +type: Software
@@ -99,36 +107,35 @@ Use double square brackets `[[...]]` for inter-wiki links and external entity li
 -status: stable
  resource: https://example.com
  ---
- 
+
 +# My Software
 +
 +An awesome software tool.
 ```
 
 ### Recipe B: Fix Magic Link Syntax
+
 ```diff
 -Refer to [[memory/cognee.md]] or [[memory/vector-search|Vector Search]] or [[¬/docs/computer/ai]].
 +Refer to [[memory/cognee]] or [[memory/vector-search]] or [[computer/ai]].
 ```
 
 ### Recipe C: Generate or Update Missing `index.md`
-When adding a new directory `docs/domain/topic/`, create `docs/domain/topic/index.md`:
-```markdown
----
-type: Index
----
 
+When adding a new directory `docs/domain/topic/` with topic concept `topic.md` and tools `tool-a.md`:
+
+```markdown
 # Topic Name
 
-Overview and index of topics and resources.
+[[topic]] - Comprehensive overview of topic concepts and architecture.
 
 ## Subcategories
 
-- [[subtopic/index]]
+- [[subtopic/index]] - Subtopic overview.
 
 ## Articles
 
-- [[article-one]]
-- [[article-two]]
+- [[tool-a]] - Specific implementation tool.
 ```
+
 And add `[[topic/index]]` to `docs/domain/index.md`.

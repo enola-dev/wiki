@@ -158,25 +158,27 @@ class WikiLinter:
         modified_body = False
 
         # 1. Frontmatter Validation
+        is_index = (file_path.name == "index.md")
         if fm_raw is None:
-            self.log_error(file_path, "Missing required YAML frontmatter (must start with '---')")
-            if self.fix:
-                doc_type = "Index" if file_path.name == "index.md" else "Article"
-                fm_raw = f"\ntype: {doc_type}\n"
-                body = content
-                modified_fm = True
-                self.log_fixed(file_path, f"Added missing frontmatter with type: {doc_type}")
+            if not is_index:
+                self.log_error(file_path, "Missing required YAML frontmatter (must start with '---')")
+                if self.fix:
+                    doc_type = "Article"
+                    fm_raw = f"\ntype: {doc_type}\n"
+                    body = content
+                    modified_fm = True
+                    self.log_fixed(file_path, f"Added missing frontmatter with type: {doc_type}")
         
         if fm_raw is not None:
             fm_data = load_yaml(fm_raw)
             if not isinstance(fm_data, dict):
                 self.log_error(file_path, "Frontmatter is not a valid YAML mapping")
             else:
-                # Check mandatory 'type:'
-                if "type" not in fm_data:
+                # Check mandatory 'type:' on non-index documents
+                if not is_index and "type" not in fm_data:
                     self.log_error(file_path, "Frontmatter missing mandatory 'type:' property")
                     if self.fix:
-                        doc_type = "Index" if file_path.name == "index.md" else "Article"
+                        doc_type = "Article"
                         fm_raw = f"\ntype: {doc_type}" + fm_raw
                         modified_fm = True
                         self.log_fixed(file_path, f"Added 'type: {doc_type}' to frontmatter")
@@ -280,6 +282,32 @@ class WikiLinter:
             reconstructed = f"---{fm_clean}---{body}"
             file_path.write_text(reconstructed, encoding="utf-8")
 
+    def extract_description(self, path: Path) -> str:
+        """Extract description from frontmatter or first paragraph."""
+        if not path.exists() or not path.is_file():
+            return ""
+        try:
+            content = path.read_text(encoding="utf-8")
+        except Exception:
+            return ""
+        fm_raw, body, _ = parse_frontmatter(content)
+        if fm_raw:
+            fm_data = load_yaml(fm_raw)
+            if isinstance(fm_data, dict) and "description" in fm_data and fm_data["description"]:
+                return " ".join(str(fm_data["description"]).split())
+        
+        # Inferred from first paragraph after H1 heading
+        body_no_code = re.sub(r"```[\s\S]*?```", "", body)
+        lines = [line.strip() for line in body_no_code.splitlines()]
+        found_h1 = False
+        for line in lines:
+            if line.startswith("# "):
+                found_h1 = True
+                continue
+            if found_h1 and line and not line.startswith("#"):
+                return " ".join(line.split())
+        return ""
+
     def check_hierarchy(self):
         """Check all directories for index.md and ensure all files are indexed."""
         for dirpath, dirnames, filenames in os.walk(self.docs_root):
@@ -289,69 +317,113 @@ class WikiLinter:
             md_files = [f for f in filenames if f.endswith(".md")]
             child_dirs = [d for d in dirnames if not d.startswith(".")]
 
+            lead_slug = dir_p.name if f"{dir_p.name}.md" in md_files else None
+            article_slugs = [f[:-3] for f in sorted(md_files) if f != "index.md" and (lead_slug is None or f != f"{lead_slug}.md")]
+
             index_file = dir_p / "index.md"
             if not index_file.exists():
                 self.log_error(dir_p, f"Directory missing 'index.md': {dir_p.relative_to(self.docs_root.parent)}")
                 if self.fix:
                     category_name = dir_p.name.replace("-", " ").title() if dir_p != self.docs_root else "Enola Wiki"
                     content_lines = [
-                        "---",
-                        "type: Index",
-                        "---",
-                        "",
                         f"# {category_name}",
                         "",
-                        f"Index and overview for {category_name}.",
-                        "",
                     ]
+                    if lead_slug:
+                        lead_path = dir_p / f"{lead_slug}.md"
+                        desc = self.extract_description(lead_path)
+                        if desc:
+                            content_lines.append(f"[[{lead_slug}]] - {desc}\n")
+                        else:
+                            content_lines.append(f"[[{lead_slug}]]\n")
                     if child_dirs:
                         content_lines.append("## Subcategories\n")
                         for d in sorted(child_dirs):
-                            content_lines.append(f"- [[{d}/index]]")
+                            child_idx = dir_p / d / "index.md"
+                            desc = self.extract_description(child_idx)
+                            if desc:
+                                content_lines.append(f"- [[{d}/index]] - {desc}")
+                            else:
+                                content_lines.append(f"- [[{d}/index]]")
                         content_lines.append("")
-                    if md_files:
+                    if article_slugs:
                         content_lines.append("## Articles\n")
-                        for f in sorted(md_files):
-                            if f != "index.md":
-                                slug = f[:-3]
+                        for slug in article_slugs:
+                            art_path = dir_p / f"{slug}.md"
+                            desc = self.extract_description(art_path)
+                            if desc:
+                                content_lines.append(f"- [[{slug}]] - {desc}")
+                            else:
                                 content_lines.append(f"- [[{slug}]]")
                         content_lines.append("")
 
-                    index_file.write_text("\n".join(content_lines), encoding="utf-8")
+                    index_file.write_text("\n".join(content_lines).strip() + "\n", encoding="utf-8")
                     self.log_fixed(index_file, f"Generated index.md for {dir_p.name}")
             else:
                 try:
                     idx_content = index_file.read_text(encoding="utf-8")
                     modified_idx = False
 
+                    # Check lead slug in index
+                    if lead_slug:
+                        # If lead_slug was listed in ## Articles, remove it from ## Articles
+                        article_lead_pattern = re.compile(
+                            r"(?m)^[ \t]*[-*][ \t]+\[\[" + re.escape(lead_slug) + r"\]\](?:[ \t]*-[ \t]*[^\r\n]*)?[ \t]*\r?\n?"
+                        )
+                        new_content = article_lead_pattern.sub("", idx_content)
+                        if new_content != idx_content:
+                            idx_content = new_content
+                            modified_idx = True
+                            self.log_fixed(index_file, f"Removed lead concept [[{lead_slug}]] from ## Articles")
+
+                        # Ensure lead_slug is in preamble
+                        lead_in_preamble = f"[[{lead_slug}]]" in idx_content
+                        if not lead_in_preamble:
+                            desc = self.extract_description(dir_p / f"{lead_slug}.md")
+                            lead_line = f"[[{lead_slug}]] - {desc}" if desc else f"[[{lead_slug}]]"
+                            h1_match = re.search(r"(?m)^#\s+[^\r\n]+$", idx_content)
+                            if h1_match:
+                                h1_end = h1_match.end()
+                                next_heading = re.search(r"(?m)^#{1,6}\s+", idx_content[h1_end:])
+                                preamble_end = (h1_end + next_heading.start()) if next_heading else len(idx_content)
+                                preamble = idx_content[h1_end:preamble_end].strip()
+                                after = idx_content[preamble_end:]
+                                if not preamble:
+                                    idx_content = idx_content[:h1_end] + f"\n\n{lead_line}\n\n" + after
+                                else:
+                                    idx_content = idx_content[:h1_end] + f"\n\n{lead_line}\n\n{preamble}\n\n" + after
+                                modified_idx = True
+                                self.log_fixed(index_file, f"Added lead concept [[{lead_slug}]] to preamble")
+
                     # Check child directories in index
                     for d in child_dirs:
                         if f"[[{d}/index]]" not in idx_content and f"[[{d}]]" not in idx_content and f"{d}/index" not in idx_content:
                             self.log_warning(index_file, f"Subcategory '{d}' is not linked in {dir_p.name}/index.md")
                             if self.fix:
+                                desc = self.extract_description(dir_p / d / "index.md")
+                                item_line = f"- [[{d}/index]] - {desc}" if desc else f"- [[{d}/index]]"
                                 if "## Subcategories" in idx_content:
-                                    idx_content = idx_content.replace("## Subcategories", f"## Subcategories\n\n- [[{d}/index]]")
+                                    idx_content = idx_content.replace("## Subcategories", f"## Subcategories\n\n{item_line}")
                                 else:
-                                    # Insert before ## Articles if present, else append
                                     if "## Articles" in idx_content:
-                                        idx_content = idx_content.replace("## Articles", f"## Subcategories\n\n- [[{d}/index]]\n\n## Articles")
+                                        idx_content = idx_content.replace("## Articles", f"## Subcategories\n\n{item_line}\n\n## Articles")
                                     else:
-                                        idx_content += f"\n## Subcategories\n\n- [[{d}/index]]\n"
+                                        idx_content += f"\n## Subcategories\n\n{item_line}\n"
                                 modified_idx = True
                                 self.log_fixed(index_file, f"Added subcategory link [[{d}/index]] to index.md")
 
-                    # Check sibling articles in index
-                    for f in md_files:
-                        if f == "index.md":
-                            continue
-                        slug = f[:-3]
+                    # Check sibling articles in index (excluding lead_slug)
+                    for slug in article_slugs:
+                        f = f"{slug}.md"
                         if f"[[{slug}]]" not in idx_content and f"[[{slug}.md]]" not in idx_content and f"{slug}.md" not in idx_content:
                             self.log_warning(index_file, f"Article '{f}' is not linked in {dir_p.name}/index.md (orphan risk)")
                             if self.fix:
+                                desc = self.extract_description(dir_p / f)
+                                item_line = f"- [[{slug}]] - {desc}" if desc else f"- [[{slug}]]"
                                 if "## Articles" in idx_content:
-                                    idx_content = idx_content.replace("## Articles", f"## Articles\n\n- [[{slug}]]")
+                                    idx_content = idx_content.replace("## Articles", f"## Articles\n\n{item_line}")
                                 else:
-                                    idx_content += f"\n## Articles\n\n- [[{slug}]]\n"
+                                    idx_content += f"\n## Articles\n\n{item_line}\n"
                                 modified_idx = True
                                 self.log_fixed(index_file, f"Added link [[{slug}]] to index.md")
 

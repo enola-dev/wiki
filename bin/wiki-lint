@@ -1,1 +1,2 @@
+#!/usr/bin/env bash
 nix-shell -p python3 --run "python3 .agents/skills/wiki-maintenance/scripts/wiki_lint.py --check"
