@@ -1,5 +1,9 @@
 # ToDo
 
+- [ ] Turn this into a SaaS? 🧓
+
+- [ ] Store prompts and session trajectories alongside, and link to it from articles
+
 - [ ] Figure out how to configure Antigravity, or use another Harness, to prompt Wiki updates - without constantly:
   - asking for permission to access each external website
   - skip proposing an Implementation plan
