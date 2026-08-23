@@ -4,7 +4,11 @@ resource: https://vorburger.ch
 generated: { by: human:/people/vorburger.ch, at: 2026-08-23T15:46:03Z}
 tags: [enola.dev]
 
-schema:givenName:  Michael
+"@context":
+  schema: https://schema.org/
+  wikidata: https://www.wikidata.org/wiki/
+
+schema:givenName: Michael
 schema:familyName: Vorburger
 schema:image: https://www.vorburger.ch/michael_vorburger_portrait_in_bay_of_roses_spain_with_bad_lighting.jpg
 schema:email: figure-it-out@vorburger.ch

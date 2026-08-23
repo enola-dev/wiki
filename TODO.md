@@ -1,6 +1,8 @@
 # ToDo
 
-- [ ] Validate if `/people/vorburger.ch.md` matches the spec described in AGENTS.md, and if not, fix it.
+- [x] Validate if `/people/vorburger.ch.md` matches the spec described in AGENTS.md, and if not, fix it.
+
+- [ ] Find, or write, a command line AI harness runner (`agy`, with policy?) which can run our`/wiki-maintenance` skill once a week or whatever (without prompts, yet safe)
 
 - [ ] [JSON Schema for OKF frontmatter](https://github.com/GoogleCloudPlatform/open-knowledge-format/issues/8) (useable e.g. by a validator for it)
 
