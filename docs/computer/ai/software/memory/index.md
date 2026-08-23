@@ -1,25 +1,16 @@
----
-type: Index
----
+# Memory
 
-# LLM and Agent Memory
+## Articles
 
-Index and overview of architectures, frameworks, and software providers for persistent LLM and AI agent memory.
-
-## Concepts & Architecture
-
-- [[memory]] - Foundational concepts, cognitive taxonomy (episodic, semantic, procedural, working), and architectural paradigms for LLM agent memory.
-
-## Articles & Software Providers
-
-- [[cognee]] - Open-source topological memory engine organizing unstructured data into knowledge graphs and vector embeddings.
-- [[mem0]] - Open-source personalized memory layer with multi-level scoping (user, agent, session) and automated fact extraction.
-- [[letta]] - Stateful agent operating system with virtual context memory paging (core, recall, archival).
-- [[graphiti]] - Open-source temporal knowledge graph engine for dynamic agent memory and entity tracking over time (powering Zep).
-- [[cmem]] - Open-source persistent memory stream and context compressor tailored for coding agents (Claude Code, OpenClaw).
-- [[memory-store]] - AI-native memory layer and company brain by Julep AI with Model Context Protocol (MCP) support.
-- [[langmem]] - Long-term memory SDK by LangChain for semantic user profiles, episodic interaction summaries, and procedural rules.
-- [[honcho]] - User-modeling and natural language plasticity memory platform by Plastic Labs.
-- [[supermemory]] - Open-source second brain and context engine connecting external data to LLMs via MCP.
-- [[hipporag]] - Neurobiologically inspired multi-hop memory framework using Personalized PageRank on knowledge graphs.
-- [[hermes-memory-providers]] - Survey of pluggable external memory providers in Hermes Agent (OpenViking, Holographic HRR, Hindsight, RetainDB, ByteRover).
+- [[cmem]] - Claude-Mem (cmem.ai) is an open-source persistent memory system and context stream designed specifically for terminal coding agents and AI workflows, such as Claude Code, OpenClaw, and cursor-based environments. It captures tool executions, user decisions, file edits, and architectural constraints across development sessions, compressing and injecting relevant memories back into future agent turns.
+- [[cognee]] - Cognee is an open-source memory engine for AI applications and agents that organizes data into interconnected, topological knowledge graphs and vector embeddings. It bridges the gap between unstructured data ingestion and high-precision retrieval by transforming documents, conversations, and code into structured relational graphs enriched with semantic vectors.
+- [[graphiti]] - Graphiti is an open-source temporal knowledge graph engine designed specifically for building dynamic, persistent memory for AI agents, while Zep is a managed enterprise platform built on top of Graphiti. Graphiti addresses the limitation of traditional RAG and static knowledge graphs by continuously tracking entities, relationships, and facts as they change over time, automatically invalidating stale facts while preserving historical context.
+- [[hermes-memory-providers]] - Hermes Agent Memory Providers is a pluggable memory subsystem within Nous Research's autonomous Hermes Agent framework. While Hermes Agent includes a built-in file-based memory foundation (utilizing local MEMORY.md and USER.md markdown files), the memory provider interface enables users to attach specialized external memory engines for structured context capture, multi-hop recall, and cross-session knowledge synchronization.
+- [[hipporag]] - HippoRAG is an open-source retrieval and long-term memory framework developed by the Ohio State University NLP Group. Inspired by the hippocampal indexing theory of human memory, HippoRAG enables Large Language Models (LLMs) to perform complex, multi-hop associative recall across knowledge corpora in a single retrieval step using knowledge graphs and Personalized PageRank (PPR).
+- [[honcho]] - Honcho is an open-source, AI-native memory and user-modeling platform created by Plastic Labs. Unlike standard vector databases that perform simple semantic chunk matching, Honcho focuses on "natural language plasticity" and dialectic reasoning—building evolving, high-fidelity representations of user and agent identities, psychological traits, and cognitive state over long time horizons.
+- [[langmem]] - LangMem is an open-source Python SDK developed by LangChain to provide AI agents and LangGraph workflows with long-term memory. It allows agents to learn, adapt, and maintain behavioral consistency across sessions by automatically extracting, storing, and consolidating semantic facts, episodic interaction summaries, and procedural execution patterns.
+- [[letta]] - Letta (formerly MemGPT) is an open-source framework and runtime for building stateful AI agents with persistent, self-editing memory. Drawing inspiration from traditional operating system memory hierarchies, Letta enables LLMs to function as operating systems that manage their own context windows through virtual memory paging, tool calls, and archival search.
+- [[mem0]] - Mem0 (formerly Embedchain) is an open-source intelligent memory layer designed to provide personalized, persistent long-term memory for AI agents, assistants, and applications. It continuously extracts, refines, and deduplicates user preferences, session history, and agent state across conversations, enabling models to adapt dynamically to individual users over time.
+- [[memory]] - LLM and Agent Memory refers to the software architectures, data structures, and algorithms that provide Large Language Model (LLM) agents with persistent, stateful, and adaptive context across interactions and time. While standard foundation models are stateless between API calls and traditional Retrieval-Augmented Generation (RAG) focuses on static document retrieval, agent memory systems enable continuous learning, self-updating user profiles, episodic recall, and procedural skill acquisition.
+- [[memory-store]] - Memory Store (memory.store) is an AI-native persistent memory layer and "company brain" built by the creators of Julep AI. It captures decisions, facts, and context across fragmented tools (such as Slack, Gmail, IDEs, Claude, and ChatGPT) and synthesizes them into structured, auto-updating knowledge accessible by AI agents through the Model Context Protocol (MCP) and REST APIs.
+- [[supermemory]] - Supermemory is an open-source "second brain" and memory engine designed to provide AI agents and human users with persistent context across applications. It connects diverse information sources (such as bookmarks, browser history, Google Drive, Notion, Slack, and GitHub) and synthesizes them into an intelligent context layer accessible via the Model Context Protocol (MCP), REST APIs, and client extensions.

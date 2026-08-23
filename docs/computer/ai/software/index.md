@@ -1,10 +1,4 @@
----
-type: Index
----
-
 # Software
-
-Index and overview for Software.
 
 ## Subcategories
 
@@ -12,4 +6,4 @@ Index and overview for Software.
 
 ## Articles
 
-- [[antigravity]]
+- [[antigravity]] - Google Antigravity is an AI-first software development platform and agentic coding environment comprising a desktop application, IDE extensions, and the agy command-line interface.

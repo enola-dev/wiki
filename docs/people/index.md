@@ -1,11 +1,5 @@
----
-type: Index
----
-
 # People
-
-Index and overview for People.
 
 ## Articles
 
-- [[vorburger.ch]]
+- [[vorburger.ch]] - Michael Vorburger is a Swiss software engineer, entrepreneur, and open-source advocate.

@@ -27,6 +27,8 @@ schema:sameAs: https://orcid.org/0009-0001-4017-9397
 
 # Michael Vorburger.ch
 
-Michael Vorburger is a Swiss software engineer, entrepreneur, and open-source advocate. He is known for his contributions to various open-source projects and his work in the field of software development.
+Michael Vorburger is a Swiss software engineer, entrepreneur, and open-source advocate.
+
+He is known for his contributions to various open-source projects and his work in the field of software development.
 
 His personal homepage is [vorburger.ch](https://vorburger.ch).

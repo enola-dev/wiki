@@ -21,8 +21,6 @@
 
 - [ ] Create a new small separate `okf-tools` repo, and use an existing Java MD parser to write an initial basic validator of MD and YAML frontmatter, including checking for the required `type:` field, using a JSON Schema.
 
-- [ ] `okf generate index` command to auto-generate `index.md` files for all subdirectories, with a list of all `.md` files in that directory, and a link to the parent directory.
-
 - [ ] `wiki generate broken` to auto-generate a `BROKEN.md` file with a list of all broken links in the repo, and a link to the source files.
 
 - [ ] `todo generate` command to auto-generate a TODO.md file with `- [ ]` items from all `.md` files in the repo, and a link to the source file.

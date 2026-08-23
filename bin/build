@@ -1,1 +1,2 @@
+../enola2/enola2 md2index docs/
 ../enola2/enola2 mds2md docs/ out/markdown/
