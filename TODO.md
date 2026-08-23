@@ -2,9 +2,9 @@
 
 - [ ] Validate if `/people/vorburger.ch.md` matches the spec described in AGENTS.md, and if not, fix it.
 
-- [ ] Create a https://github.com/GoogleCloudPlatform/open-knowledge-format/issues suggesting a JSON Schema for OKF frontmatter (useable e.g. by a validator for it).
+- [ ] [JSON Schema for OKF frontmatter](https://github.com/GoogleCloudPlatform/open-knowledge-format/issues/8) (useable e.g. by a validator for it)
 
-- [ ] Create a https://github.com/GoogleCloudPlatform/open-knowledge-format/issues suggesting https://docs.enola.dev/specs/markdown-magic-link support.
+- [ ] [Permit MediaWiki-style internal links syntax ([[`concept`]]) in OKF Markdown](https://github.com/GoogleCloudPlatform/open-knowledge-format/issues/9).
 
 - [ ] Transform AGENTS.md into `docs/computer/ai/software/enola/wiki.md` (?), and keep it in sync #AI
 
