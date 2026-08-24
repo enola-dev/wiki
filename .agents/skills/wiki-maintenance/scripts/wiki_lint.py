@@ -125,6 +125,8 @@ class WikiLinter:
                         self.log_fixed(path, "Removed auto-generated 'index.md'")
                     except Exception as e:
                         self.log_error(path, f"Failed to delete 'index.md': {e}")
+            elif path.name.lower() == "readme.md":
+                pass  # README.md is explicitly allowed as an optional GitHub landing page per AGENTS.md §2
             elif not SLUG_REGEX.match(name):
                 self.log_error(path, f"File name '{path.name}' should be lowercase kebab-case/domain slug")
         elif path.is_dir():
@@ -157,7 +159,7 @@ class WikiLinter:
 
     def lint_and_fix_file(self, file_path: Path):
         self.check_naming(file_path)
-        if file_path.name.lower() == "index.md":
+        if file_path.name.lower() in ("index.md", "readme.md"):
             return
 
         try:
