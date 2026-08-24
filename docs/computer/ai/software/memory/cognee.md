@@ -63,11 +63,11 @@ if __name__ == "__main__":
 
 ## Supported Storage Backends
 
-| Component | Embedded / Local | Production / Distributed |
-| :--- | :--- | :--- |
-| **Relational DB** | SQLite | PostgreSQL |
-| **Graph DB** | NetworkX, Kùzu | Neo4j, FalkorDB |
-| **Vector DB** | LanceDB, ChromaDB | Qdrant, Milvus, pgvector |
+| Component         | Embedded / Local  | Production / Distributed |
+| :---------------- | :---------------- | :----------------------- |
+| **Relational DB** | SQLite            | PostgreSQL               |
+| **Graph DB**      | NetworkX, Kùzu    | Neo4j, FalkorDB          |
+| **Vector DB**     | LanceDB, ChromaDB | Qdrant, Milvus, pgvector |
 
 ## Related Concepts
 

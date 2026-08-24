@@ -42,18 +42,22 @@ graph TD
 Modern AI memory systems adopt cognitive psychology classifications to structure long-term agent state:
 
 ### 1. Working Memory (Short-Term / In-Context)
+
 - **Definition**: The active context window of the LLM containing the immediate prompt, recent conversational turns, tool call outputs, and scratchpad reasoning.
 - **Characteristics**: Fast, volatile, strictly bounded by the model's maximum context length and attention budget.
 
 ### 2. Episodic Memory (Events & Experiences)
+
 - **Definition**: Temporal records of past events, conversations, user interactions, and multi-step task executions ("what happened, when, and how").
 - **Characteristics**: Time-stamped, append-heavy, often compressed or summarized periodically to preserve long-range experiential history.
 
 ### 3. Semantic Memory (Facts & Knowledge)
+
 - **Definition**: Discrete, factual knowledge about users, organizations, codebases, and domain concepts ("what is true").
 - **Characteristics**: Extracted and synthesized from episodic events; subject to continuous updating, deduplication, and contradiction resolution.
 
 ### 4. Procedural Memory (Skills & Rules)
+
 - **Definition**: How-to knowledge, behavioral guidelines, playbooks, prompts, and learned tool execution patterns ("how to act").
 - **Characteristics**: Iteratively refined through feedback loops, error corrections, and reinforcement.
 
@@ -63,24 +67,24 @@ Modern AI memory systems adopt cognitive psychology classifications to structure
 
 Agent memory architectures have evolved into several distinct design patterns:
 
-| Paradigm | Description | Representative Systems | Strengths | Trade-offs |
-| :--- | :--- | :--- | :--- | :--- |
-| **Flat Markdown & File Memory** | Memory stored in human-readable Markdown files (`MEMORY.md`, `USER.md`) with lightweight embeddings. | [[cmem]], [[hermes-memory-providers]], OpenClaw | Inspectable, versionable with Git, transparent. | Limited multi-hop relational reasoning. |
-| **Fact-Extraction & Vector Layers** | Automated LLM extraction of atomic facts into vector databases with decay and reflection. | [[mem0]], [[supermemory]], [[langmem]] | Fast semantic search, automatic deduplication, easy integration. | Weak temporal invalidation and relational joins. |
-| **LLM-as-an-OS (Virtual Paging)** | Hierarchical memory tiers (Core, Archival, Recall) actively managed by the LLM via tool calls. | [[letta]] | Self-editing memory, explicit memory control by the agent. | Higher LLM token overhead during paging operations. |
-| **Temporal Knowledge Graphs** | Knowledge graphs linking entities, relationships, and temporal validities with hybrid search. | [[graphiti]], [[cognee]], [[hipporag]] | Multi-hop reasoning, temporal fact invalidation, structured context. | Graph construction latency and schema complexity. |
-| **Cognitive Databases & MCP** | Shared memory infrastructure exposed to agents via the Model Context Protocol (MCP) or APIs. | [[memory-store]], [[honcho]] | Cross-tool interoperability, team-wide context sharing. | Requires network infrastructure and multi-agent coordination. |
+| Paradigm                            | Description                                                                                          | Representative Systems                          | Strengths                                                            | Trade-offs                                                    |
+| :---------------------------------- | :--------------------------------------------------------------------------------------------------- | :---------------------------------------------- | :------------------------------------------------------------------- | :------------------------------------------------------------ |
+| **Flat Markdown & File Memory**     | Memory stored in human-readable Markdown files (`MEMORY.md`, `USER.md`) with lightweight embeddings. | [[cmem]], [[hermes-memory-providers]], OpenClaw | Inspectable, versionable with Git, transparent.                      | Limited multi-hop relational reasoning.                       |
+| **Fact-Extraction & Vector Layers** | Automated LLM extraction of atomic facts into vector databases with decay and reflection.            | [[mem0]], [[supermemory]], [[langmem]]          | Fast semantic search, automatic deduplication, easy integration.     | Weak temporal invalidation and relational joins.              |
+| **LLM-as-an-OS (Virtual Paging)**   | Hierarchical memory tiers (Core, Archival, Recall) actively managed by the LLM via tool calls.       | [[letta]]                                       | Self-editing memory, explicit memory control by the agent.           | Higher LLM token overhead during paging operations.           |
+| **Temporal Knowledge Graphs**       | Knowledge graphs linking entities, relationships, and temporal validities with hybrid search.        | [[graphiti]], [[cognee]], [[hipporag]]          | Multi-hop reasoning, temporal fact invalidation, structured context. | Graph construction latency and schema complexity.             |
+| **Cognitive Databases & MCP**       | Shared memory infrastructure exposed to agents via the Model Context Protocol (MCP) or APIs.         | [[memory-store]], [[honcho]]                    | Cross-tool interoperability, team-wide context sharing.              | Requires network infrastructure and multi-agent coordination. |
 
 ---
 
 ## Memory vs. Traditional RAG
 
-| Dimension | Traditional RAG | Agent Memory Systems |
-| :--- | :--- | :--- |
-| **Data Flow** | Read-only (one-way retrieval from external corpora) | Read-Write (bidirectional continuous extraction, storage, and recall) |
-| **Lifecycle** | Static documents indexed in advance | Dynamic, self-improving, updated after each conversation or task turn |
-| **Focus** | Document chunk matching via semantic similarity | Entity relationships, user identity, temporal awareness, and behavioral adaptation |
-| **Decay & Update** | Re-index entire corpus when documents change | Incremental extraction, entity resolution, and temporal invalidation |
+| Dimension          | Traditional RAG                                     | Agent Memory Systems                                                               |
+| :----------------- | :-------------------------------------------------- | :--------------------------------------------------------------------------------- |
+| **Data Flow**      | Read-only (one-way retrieval from external corpora) | Read-Write (bidirectional continuous extraction, storage, and recall)              |
+| **Lifecycle**      | Static documents indexed in advance                 | Dynamic, self-improving, updated after each conversation or task turn              |
+| **Focus**          | Document chunk matching via semantic similarity     | Entity relationships, user identity, temporal awareness, and behavioral adaptation |
+| **Decay & Update** | Re-index entire corpus when documents change        | Incremental extraction, entity resolution, and temporal invalidation               |
 
 ---
 

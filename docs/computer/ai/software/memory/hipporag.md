@@ -36,6 +36,7 @@ graph TD
 Traditional RAG systems mimic the neocortex by relying on dense vector embeddings for semantic similarity, which struggle with multi-hop associative reasoning without slow, iterative multi-turn retrieval loops.
 
 HippoRAG models human brain architecture:
+
 - **Neocortex (LLMs & Embeddings)**: Extracts structured triples and forms representations.
 - **Hippocampus (Personalized PageRank & Graph Index)**: Acts as an indexing engine connecting distinct entities across disparate documents, allowing pattern separation and associative pattern completion in a single algorithmic pass.
 

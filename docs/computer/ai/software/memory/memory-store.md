@@ -55,11 +55,11 @@ graph TD
 
 When integrated into an MCP client, Memory Store exposes three fundamental cognitive primitives:
 
-| Tool | Purpose | Example Use |
-| :--- | :--- | :--- |
-| `record` | Stores a discrete decision, user preference, or fact. | Recording an architectural choice or database schema constraint. |
-| `recall` | Queries memory using semantic search and entity filters. | Looking up prior conventions or decisions before generating code. |
-| `check_in` | Syncs current session status, tasks, and progress. | Saving checkpoint state when wrapping up a development turn. |
+| Tool       | Purpose                                                  | Example Use                                                       |
+| :--------- | :------------------------------------------------------- | :---------------------------------------------------------------- |
+| `record`   | Stores a discrete decision, user preference, or fact.    | Recording an architectural choice or database schema constraint.  |
+| `recall`   | Queries memory using semantic search and entity filters. | Looking up prior conventions or decisions before generating code. |
+| `check_in` | Syncs current session status, tasks, and progress.       | Saving checkpoint state when wrapping up a development turn.      |
 
 ## Quickstart via MCP Configuration
 

@@ -27,16 +27,17 @@ When managing permissions (via the `/permissions` interactive TUI in `agy` or th
 
 ### Storage Locations on Disk
 
-| Scope | Location on Disk | Description |
-| :--- | :--- | :--- |
-| **Project Permissions** | `~/.gemini/config/projects/<project-uuid>.json` | Project-scoped permission grants and trusted settings, keyed to the local repository directory path. |
-| **Global CLI Settings** | `~/.gemini/antigravity-cli/settings.json` | User-level global settings and global permission grants. |
-| **Shared Antigravity Config** | `~/.gemini/config/` / `~/.gemini/antigravity/` | Cross-surface preferences and shared state. |
+| Scope                         | Location on Disk                                | Description                                                                                          |
+| :---------------------------- | :---------------------------------------------- | :--------------------------------------------------------------------------------------------------- |
+| **Project Permissions**       | `~/.gemini/config/projects/<project-uuid>.json` | Project-scoped permission grants and trusted settings, keyed to the local repository directory path. |
+| **Global CLI Settings**       | `~/.gemini/antigravity-cli/settings.json`       | User-level global settings and global permission grants.                                             |
+| **Shared Antigravity Config** | `~/.gemini/config/` / `~/.gemini/antigravity/`  | Cross-surface preferences and shared state.                                                          |
 
 ### Repository-Level vs. Local Security Isolation
 
 Project permissions **cannot** be defined or committed directly within the Git repository folder itself (such as a checked-in `.antigravity/permissions.json`).
 
 This design is a deliberate security boundary:
+
 * **Preventing Repo-Level Privilege Escalation**: If repositories could declare their own permission bypasses or auto-approval rules in checked-in files, cloning an untrusted or malicious third-party repository could lead to arbitrary command execution, network exfiltration, or local file compromises without user consent.
 * **Separation of Capabilities and Authorization**: Collaborative assets such as custom agent instructions, rules, workflows, and tools are shared via the repository (in `AGENTS.md`, `GEMINI.md`, and `.agents/`), while actual permission authorizations remain strictly under the developer's local user-level control.
