@@ -30,8 +30,17 @@ body {
   user-select: none;
 }
 
-.edit-button {
+.header-actions {
   float: right;
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.action-button,
+.edit-button,
+.md-button {
   padding: 0.35rem 0.75rem;
   border: 1px solid #d0d7de;
   border-radius: 6px;
@@ -46,7 +55,9 @@ body {
   transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
 }
 
-.edit-button:hover {
+.action-button:hover,
+.edit-button:hover,
+.md-button:hover {
   background-color: #f3f4f6;
   border-color: #1b1f2426;
   text-decoration: none;
