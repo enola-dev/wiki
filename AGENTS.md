@@ -41,18 +41,25 @@ docs/
 - Avoid spaces and special characters in file/folder names.
 - Do NOT create or check in `index.md` files in `docs/`. All category indexes are purely auto-generated build artifacts created by `bin/build`.
 
-### Topic Lead Concepts & Directory Indexing
+### Topic Lead Concepts, Source READMEs & Directory Indexing
 
-When a directory focuses on an overarching topic or concept (such as `.../software/memory/`):
+When organizing and indexing categories in `docs/`:
 
-1. **Lead Concept Document (`<dir>/<dir>.md`)**:
+1. **Source `README.md` (Optional GitHub Landing Page)**:
+   - A directory MAY contain an optional `README.md` (e.g. `docs/README.md` for the Wiki About, or `docs/.../memory/README.md`) so that GitHub's web interface renders a rich landing page when browsing that folder.
+   - **Mutual Exclusion**: A directory must NEVER contain both `index.md` and `README.md`.
+   - `README.md` is never listed under `## Articles`. In the output bundle / HTML build, `README.md` is automatically converted to `index.md` / `index.html`.
+2. **Lead Concept Document (`<dir>/<dir>.md`)**:
    - The directory MAY contain a concept document named identically to the directory itself (e.g., `docs/.../memory/memory.md`).
    - This document serves as the foundational **topic overview / architectural concept** (e.g. general principles, taxonomy, comparison tables) for that category, while sibling files describe specific implementations, libraries, or tools (e.g., `letta.md`, `graphiti.md`).
-2. **Auto-Generated Index Presentation & Progressive Disclosure**:
-   - In accordance with OKF §8, category indexes (`index.md` / `index.html`) are generated dynamically during `bin/build`.
-   - When a matching `<dir>/<dir>.md` exists, the build generator automatically places its link and summary as the **preamble** immediately below the `# <Category>` H1 heading:
+3. **Auto-Generated Index Presentation & Progressive Disclosure**:
+   - In accordance with OKF §8, category indexes (`index.md` / `index.html`) are generated dynamically in memory during `bin/build` (via `md2md` or `md2html`).
+   - When a source `README.md` exists, its H1 heading and intro text are used as the category title and preamble.
+   - When a matching `<dir>/<dir>.md` exists, its link and summary are placed into the preamble (merged after any custom intro prose from `README.md`):
      ```markdown
-     # Memory
+     # Memory Systems
+
+     Overview and catalog of persistent memory engines, context managers, and stateful architectures for AI agents.
 
      [[memory]] - LLM and Agent Memory refers to the software architectures, data structures, and algorithms...
 
@@ -61,7 +68,7 @@ When a directory focuses on an overarching topic or concept (such as `.../softwa
      - [[cmem]] - Claude-Mem is an open-source persistent memory system...
      - [[letta]] - Letta is an open-source framework...
      ```
-   - The lead concept (`[[memory]]`) is automatically omitted from the `## Articles` list to avoid duplicate indexing.
+   - The lead concept (`[[memory]]`) and `README.md` are automatically omitted from the `## Articles` list to avoid duplicate indexing.
    - If no matching `<dir>/<dir>.md` exists, all articles in that directory are listed under `## Articles`.
 
 ---
