@@ -1,6 +1,6 @@
 ---
 name: wiki-maintenance
-description: Validates and repairs Markdown documents in docs/ against AGENTS.md conventions (frontmatter, heading hierarchy, naming, magic links, parent index linking, and orphan elimination). Use when auditing wiki health, verifying markdown files, or fixing format inconsistencies.
+description: Validates and repairs Markdown documents in docs/ against AGENTS.md conventions (frontmatter, heading hierarchy, naming, and magic links). Use when auditing wiki health, verifying markdown files, or fixing format inconsistencies.
 ---
 
 # Wiki Maintenance Skill
@@ -18,7 +18,7 @@ bin/wiki-lint
 # Or directly via nix-shell:
 nix-shell -p python3 --run "python3 .agents/skills/wiki-maintenance/scripts/wiki_lint.py --check"
 
-# Automatically fix violations (missing frontmatter keys, illegal magic links, missing index.md, orphans)
+# Automatically fix violations (missing frontmatter keys, illegal magic links, missing H1)
 nix-shell -p python3 --run "python3 .agents/skills/wiki-maintenance/scripts/wiki_lint.py --fix"
 ```
 

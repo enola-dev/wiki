@@ -5,8 +5,7 @@ Checks and fixes:
   1. Frontmatter requirements (type mandatory, title/description omitted, status: stable omitted).
   2. Heading structure (H1 title as first heading, description as first paragraph).
   3. Magic Links syntax ([[path]] without .md, no [[foo|bar]], no [[¬/...]], no [[/...]], no dead links).
-  4. File & directory naming (lowercase, kebab-case / domain slugs, lowercase index.md).
-  5. Directory hierarchy & orphan prevention (every folder has index.md referencing child items).
+  4. File & directory naming (lowercase, kebab-case / domain slugs; no index.md in docs/).
 """
 
 import os
@@ -287,58 +286,27 @@ class WikiLinter:
             reconstructed = f"---{fm_clean}---{body}"
             file_path.write_text(reconstructed, encoding="utf-8")
 
-    def extract_description(self, path: Path) -> str:
-        """Extract description from frontmatter or first paragraph."""
-        if not path.exists() or not path.is_file():
-            return ""
-        try:
-            content = path.read_text(encoding="utf-8")
-        except Exception:
-            return ""
-        fm_raw, body, _ = parse_frontmatter(content)
-        if fm_raw:
-            fm_data = load_yaml(fm_raw)
-            if isinstance(fm_data, dict) and "description" in fm_data and fm_data["description"]:
-                return " ".join(str(fm_data["description"]).split())
-        
-        # Inferred from first paragraph after H1 heading
-        body_no_code = re.sub(r"```[\s\S]*?```", "", body)
-        lines = [line.strip() for line in body_no_code.splitlines()]
-        found_h1 = False
-        for line in lines:
-            if line.startswith("# "):
-                found_h1 = True
-                continue
-            if found_h1 and line and not line.startswith("#"):
-                return " ".join(line.split())
-        return ""
-
-    def check_hierarchy(self):
-        """Check all directory naming conventions."""
-        for dirpath, dirnames, _ in os.walk(self.docs_root):
-            dir_p = Path(dirpath)
-            self.check_naming(dir_p)
-
     def run(self) -> int:
-        for dirpath, _, filenames in os.walk(self.docs_root):
+        for dirpath, dirnames, filenames in os.walk(self.docs_root):
+            for dirname in dirnames:
+                self.check_naming(Path(dirpath) / dirname)
             for filename in filenames:
                 if filename.endswith(".md"):
                     file_path = Path(dirpath) / filename
                     self.lint_and_fix_file(file_path)
-
-        self.check_hierarchy()
 
         # If in fix mode, re-run in check mode to ensure all issues were addressed
         remaining_errors = []
         remaining_warnings = []
         if self.fix:
             checker = WikiLinter(docs_root=self.docs_root, fix=False)
-            for dirpath, _, filenames in os.walk(self.docs_root):
+            for dirpath, dirnames, filenames in os.walk(self.docs_root):
+                for dirname in dirnames:
+                    checker.check_naming(Path(dirpath) / dirname)
                 for filename in filenames:
                     if filename.endswith(".md"):
                         file_path = Path(dirpath) / filename
                         checker.lint_and_fix_file(file_path)
-            checker.check_hierarchy()
             remaining_errors = checker.errors
             remaining_warnings = checker.warnings
         else:
