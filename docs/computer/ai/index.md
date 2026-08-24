@@ -1,5 +1,0 @@
-# Ai
-
-## Subcategories
-
-- [[software/index]]
