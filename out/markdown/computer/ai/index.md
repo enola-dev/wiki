@@ -1,4 +1,4 @@
-# Ai
+# AI
 
 ## Subcategories
 

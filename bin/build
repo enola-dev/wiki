@@ -5,4 +5,4 @@ rm -rf out
 mkdir -p out/markdown out/html
 
 ../enola2/enola2 md2md docs/ out/markdown/
-../enola2/enola2 md2html docs/ out/html/
+../enola2/enola2 md2html docs/ out/html/ https://github.com/enola-dev/wiki/edit/main/docs/

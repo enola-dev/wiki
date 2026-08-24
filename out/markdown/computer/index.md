@@ -2,4 +2,4 @@
 
 ## Subcategories
 
-- [Ai](ai/index.md)
+- [AI](ai/index.md)
