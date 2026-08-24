@@ -25,8 +25,6 @@
 
 - [ ] `todo generate` command to auto-generate a TODO.md file with `- [ ]` items from all `.md` files in the repo, and a link to the source file.
 
-- [ ] Generate HTML site from Markdown, with Edit links to GitHub
-
 - [ ] publish as `wiki.enola.dev`
 
 - [ ] Have our MD parser serve as formatter - read and re-write, and run it as pre-commit
