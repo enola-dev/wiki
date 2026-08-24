@@ -2,11 +2,7 @@
 set -e
 
 rm -rf out
-mkdir -p out/docs out/markdown out/html
-cp -a docs/. out/docs/
+mkdir -p out/markdown out/html
 
-../enola2/enola2 md2index out/docs/
-../enola2/enola2 mds2md out/docs/ out/markdown/
-../enola2/enola2 md2html out/markdown/ out/html/
-
-rm -rf out/docs
+../enola2/enola2 md2md docs/ out/markdown/
+../enola2/enola2 md2html docs/ out/html/
