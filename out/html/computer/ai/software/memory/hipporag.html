@@ -6,6 +6,13 @@
 <title>HippoRAG</title>
 <link rel="alternate" type="text/markdown" href="hipporag.md">
 <link rel="stylesheet" href="../../../../wiki.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script type="module">
+  import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js';
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  hljs.highlightAll();
+  mermaid.initialize({ startOnLoad: true });
+</script>
 </head>
 <body>
 <div class="header-actions">
@@ -23,9 +30,9 @@
   <span class="breadcrumb-separator">&gt;</span>
   <a href="index.html">LLM and Agent Memory</a>
 </nav>
-<h1>HippoRAG</h1>
+<h1 id="hipporag">HippoRAG</h1>
 <p>HippoRAG is an open-source retrieval and long-term memory framework developed by the Ohio State University NLP Group. Inspired by the hippocampal indexing theory of human memory, HippoRAG enables Large Language Models (LLMs) to perform complex, multi-hop associative recall across knowledge corpora in a single retrieval step using knowledge graphs and Personalized PageRank (PPR).</p>
-<pre><code class="language-mermaid">graph TD
+<pre class="mermaid">graph TD
     Corpus[Unstructured Document Corpus / Memories] --&gt; OpenIE[Open Information Extraction via LLM]
     OpenIE --&gt; KG[Hippocampal Knowledge Graph&lt;br/&gt;Entity Nodes &amp; Relationship Triples]
     Query[Multi-Hop User Query] --&gt; QueryNER[Query Named Entity Recognition]
@@ -33,22 +40,22 @@
     SeedNodes --&gt; PPR[Personalized PageRank Algorithm]
     PPR --&gt; TopPassages[Ranked Associative Passages]
     TopPassages --&gt; LLM[LLM Response Generation]
-</code></pre>
-<h2>Neurobiological Inspiration</h2>
+</pre>
+<h2 id="neurobiological-inspiration">Neurobiological Inspiration</h2>
 <p>Traditional RAG systems mimic the neocortex by relying on dense vector embeddings for semantic similarity, which struggle with multi-hop associative reasoning without slow, iterative multi-turn retrieval loops.</p>
 <p>HippoRAG models human brain architecture:</p>
 <ul>
 <li><strong>Neocortex (LLMs &amp; Embeddings)</strong>: Extracts structured triples and forms representations.</li>
 <li><strong>Hippocampus (Personalized PageRank &amp; Graph Index)</strong>: Acts as an indexing engine connecting distinct entities across disparate documents, allowing pattern separation and associative pattern completion in a single algorithmic pass.</li>
 </ul>
-<h2>Key Characteristics</h2>
+<h2 id="key-characteristics">Key Characteristics</h2>
 <ul>
 <li><strong>Single-Step Multi-Hop Retrieval</strong>: Discovers associative connections spanning multiple documents without iterative retrieval latency.</li>
 <li><strong>High Efficiency</strong>: Significantly cheaper and faster at indexing and querying compared to iterative GraphRAG or iterative agentic search workflows.</li>
 <li><strong>Continual Learning</strong>: Accommodates incremental updates to the knowledge graph without requiring retraining or full corpus re-embedding.</li>
 <li><strong>Open Source &amp; Local</strong>: Published under the MIT license, available via PyPI (<code>pip install hipporag</code>), and fully runnable on local hardware using local LLMs (e.g., via vLLM or Ollama).</li>
 </ul>
-<h2>Python Quickstart</h2>
+<h2 id="python-quickstart">Python Quickstart</h2>
 <pre><code class="language-python">from hipporag import HippoRAG
 
 # 1. Initialize HippoRAG instance
@@ -71,7 +78,7 @@ results = hipporag.retrieve(query, top_k=2)
 for doc in results:
     print(&quot;Retrieved context:&quot;, doc)
 </code></pre>
-<h2>Related Concepts</h2>
+<h2 id="related-concepts">Related Concepts</h2>
 <ul>
 <li><a href="memory.html">LLM and Agent Memory</a> - Foundational agent memory concepts and cognitive taxonomy.</li>
 <li><a href="cognee.html">Cognee</a> - Topological knowledge graph memory engine.</li>

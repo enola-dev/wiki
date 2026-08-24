@@ -6,6 +6,13 @@
 <title>Google Antigravity</title>
 <link rel="alternate" type="text/markdown" href="antigravity.md">
 <link rel="stylesheet" href="../../../wiki.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script type="module">
+  import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js';
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  hljs.highlightAll();
+  mermaid.initialize({ startOnLoad: true });
+</script>
 </head>
 <body>
 <div class="header-actions">
@@ -21,24 +28,45 @@
   <span class="breadcrumb-separator">&gt;</span>
   <a href="index.html">Software</a>
 </nav>
-<h1>Google Antigravity</h1>
+<h1 id="google-antigravity">Google Antigravity</h1>
 <p>Google Antigravity is an AI-first software development platform and agentic coding environment comprising a desktop application, IDE extensions, and the <code>agy</code> command-line interface.</p>
-<h2>Permissions &amp; Security Architecture</h2>
+<h2 id="permissions--security-architecture">Permissions &amp; Security Architecture</h2>
 <p>Antigravity operates a unified, fine-grained permissions engine formatted as <code>action(target)</code> (such as <code>read_url(*)</code>, <code>command(git)</code>, or <code>write_file(src/)</code>). Operations are evaluated across three priority tiers: <strong>Deny &gt; Ask &gt; Allow</strong>.</p>
-<h3>Configuration Scopes</h3>
+<h3 id="configuration-scopes">Configuration Scopes</h3>
 <p>When managing permissions (via the <code>/permissions</code> interactive TUI in <code>agy</code> or the settings panel), permissions are split into three distinct scopes:</p>
 <ol>
 <li><strong>Project Scope</strong>: Rules that apply exclusively when operating within a specific project/repository.</li>
 <li><strong>Shared Scope</strong>: Rules shared across all Antigravity surfaces on the machine (IDE, Desktop App, and CLI).</li>
 <li><strong>Global Scope</strong>: Rules applied across all sessions for the <code>agy</code> CLI.</li>
 </ol>
-<h3>Storage Locations on Disk</h3>
-<p>| Scope | Location on Disk | Description |
-| :--- | :--- | :--- |
-| <strong>Project Permissions</strong> | <code>~/.gemini/config/projects/&lt;project-uuid&gt;.json</code> | Project-scoped permission grants and trusted settings, keyed to the local repository directory path. |
-| <strong>Global CLI Settings</strong> | <code>~/.gemini/antigravity-cli/settings.json</code> | User-level global settings and global permission grants. |
-| <strong>Shared Antigravity Config</strong> | <code>~/.gemini/config/</code> / <code>~/.gemini/antigravity/</code> | Cross-surface preferences and shared state. |</p>
-<h3>Repository-Level vs. Local Security Isolation</h3>
+<h3 id="storage-locations-on-disk">Storage Locations on Disk</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Scope</th>
+<th align="left">Location on Disk</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>Project Permissions</strong></td>
+<td align="left"><code>~/.gemini/config/projects/&lt;project-uuid&gt;.json</code></td>
+<td align="left">Project-scoped permission grants and trusted settings, keyed to the local repository directory path.</td>
+</tr>
+<tr>
+<td align="left"><strong>Global CLI Settings</strong></td>
+<td align="left"><code>~/.gemini/antigravity-cli/settings.json</code></td>
+<td align="left">User-level global settings and global permission grants.</td>
+</tr>
+<tr>
+<td align="left"><strong>Shared Antigravity Config</strong></td>
+<td align="left"><code>~/.gemini/config/</code> / <code>~/.gemini/antigravity/</code></td>
+<td align="left">Cross-surface preferences and shared state.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="repository-level-vs-local-security-isolation">Repository-Level vs. Local Security Isolation</h3>
 <p>Project permissions <strong>cannot</strong> be defined or committed directly within the Git repository folder itself (such as a checked-in <code>.antigravity/permissions.json</code>).</p>
 <p>This design is a deliberate security boundary:</p>
 <ul>

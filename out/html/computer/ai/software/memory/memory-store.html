@@ -6,6 +6,13 @@
 <title>Memory Store (Julep)</title>
 <link rel="alternate" type="text/markdown" href="memory-store.md">
 <link rel="stylesheet" href="../../../../wiki.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script type="module">
+  import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js';
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  hljs.highlightAll();
+  mermaid.initialize({ startOnLoad: true });
+</script>
 </head>
 <body>
 <div class="header-actions">
@@ -23,9 +30,9 @@
   <span class="breadcrumb-separator">&gt;</span>
   <a href="index.html">LLM and Agent Memory</a>
 </nav>
-<h1>Memory Store (Julep)</h1>
+<h1 id="memory-store-julep">Memory Store (Julep)</h1>
 <p>Memory Store (<code>memory.store</code>) is an AI-native persistent memory layer and &quot;company brain&quot; built by the creators of Julep AI. It captures decisions, facts, and context across fragmented tools (such as Slack, Gmail, IDEs, Claude, and ChatGPT) and synthesizes them into structured, auto-updating knowledge accessible by AI agents through the Model Context Protocol (MCP) and REST APIs.</p>
-<pre><code class="language-mermaid">graph TD
+<pre class="mermaid">graph TD
     subgraph &quot;External Context Sources&quot;
         Slack[Slack / Email / Notes]
         IDE[IDE / Git / Coding Agents]
@@ -45,22 +52,43 @@
 
     RelationalStore &amp; VectorStore &amp; Briefs --&gt; MCP &amp; REST
     MCP &amp; REST --&gt; Agent[AI Agents &amp; Workflows]
-</code></pre>
-<h2>Key Characteristics</h2>
+</pre>
+<h2 id="key-characteristics">Key Characteristics</h2>
 <ul>
 <li><strong>Cross-Tool Living Memory</strong>: Gathers insights across team tools and IDE sessions, allowing agents to retain context without dumping entire message logs into prompts.</li>
 <li><strong>Model Context Protocol (MCP) Integration</strong>: Native MCP server providing core memory tools (<code>record</code>, <code>recall</code>, <code>check_in</code>), making it instantly compatible with MCP-compliant clients like Claude Code, Cursor, and custom agent harnesses.</li>
 <li><strong>Auto-Updating &quot;Briefs&quot;</strong>: Generates self-maintaining documentation and decision logs that evolve dynamically as new interactions occur.</li>
 <li><strong>Open-Source Infrastructure</strong>: Built on top of the open-source Julep agent workflow engine (utilizing PostgreSQL, TimescaleDB, and <code>pgvector</code> for state persistence).</li>
 </ul>
-<h2>MCP Tools Interface</h2>
+<h2 id="mcp-tools-interface">MCP Tools Interface</h2>
 <p>When integrated into an MCP client, Memory Store exposes three fundamental cognitive primitives:</p>
-<p>| Tool | Purpose | Example Use |
-| :--- | :--- | :--- |
-| <code>record</code> | Stores a discrete decision, user preference, or fact. | Recording an architectural choice or database schema constraint. |
-| <code>recall</code> | Queries memory using semantic search and entity filters. | Looking up prior conventions or decisions before generating code. |
-| <code>check_in</code> | Syncs current session status, tasks, and progress. | Saving checkpoint state when wrapping up a development turn. |</p>
-<h2>Quickstart via MCP Configuration</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Tool</th>
+<th align="left">Purpose</th>
+<th align="left">Example Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>record</code></td>
+<td align="left">Stores a discrete decision, user preference, or fact.</td>
+<td align="left">Recording an architectural choice or database schema constraint.</td>
+</tr>
+<tr>
+<td align="left"><code>recall</code></td>
+<td align="left">Queries memory using semantic search and entity filters.</td>
+<td align="left">Looking up prior conventions or decisions before generating code.</td>
+</tr>
+<tr>
+<td align="left"><code>check_in</code></td>
+<td align="left">Syncs current session status, tasks, and progress.</td>
+<td align="left">Saving checkpoint state when wrapping up a development turn.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="quickstart-via-mcp-configuration">Quickstart via MCP Configuration</h2>
 <p>To configure Memory Store in an MCP client configuration (such as <code>claude_desktop_config.json</code>):</p>
 <pre><code class="language-json">{
   &quot;mcpServers&quot;: {
@@ -74,7 +102,7 @@
   }
 }
 </code></pre>
-<h2>Related Concepts</h2>
+<h2 id="related-concepts">Related Concepts</h2>
 <ul>
 <li><a href="memory.html">LLM and Agent Memory</a> - Foundational agent memory concepts and taxonomy.</li>
 <li><a href="cmem.html">Claude-Mem (cmem.ai)</a> - Persistent memory stream for coding agents.</li>

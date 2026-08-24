@@ -6,6 +6,13 @@
 <title>Hermes Agent Memory Providers</title>
 <link rel="alternate" type="text/markdown" href="hermes-memory-providers.md">
 <link rel="stylesheet" href="../../../../wiki.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script type="module">
+  import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js';
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  hljs.highlightAll();
+  mermaid.initialize({ startOnLoad: true });
+</script>
 </head>
 <body>
 <div class="header-actions">
@@ -23,9 +30,9 @@
   <span class="breadcrumb-separator">&gt;</span>
   <a href="index.html">LLM and Agent Memory</a>
 </nav>
-<h1>Hermes Agent Memory Providers</h1>
+<h1 id="hermes-agent-memory-providers">Hermes Agent Memory Providers</h1>
 <p>Hermes Agent Memory Providers is a pluggable memory subsystem within Nous Research's autonomous Hermes Agent framework. While Hermes Agent includes a built-in file-based memory foundation (utilizing local <code>MEMORY.md</code> and <code>USER.md</code> markdown files), the memory provider interface enables users to attach specialized external memory engines for structured context capture, multi-hop recall, and cross-session knowledge synchronization.</p>
-<pre><code class="language-mermaid">graph TD
+<pre class="mermaid">graph TD
     Agent[Hermes Agent Core] &lt;--&gt; LocalBase[&quot;Default Local Foundation (MEMORY.md / USER.md)&quot;]
     Agent &lt;--&gt; ProviderManager[Memory Provider Manager]
 
@@ -39,8 +46,8 @@
         ProviderManager &lt;--&gt; Hindsight[&quot;Hindsight (Knowledge graph reflection)&quot;]
         ProviderManager &lt;--&gt; Supermemory[&quot;Supermemory (MCP context engine)&quot;]
     end
-</code></pre>
-<h2>How Hermes Memory Providers Work</h2>
+</pre>
+<h2 id="how-hermes-memory-providers-work">How Hermes Memory Providers Work</h2>
 <p>External memory providers in Hermes Agent operate alongside (rather than replacing) the built-in foundation:</p>
 <ol>
 <li><strong>Pre-Turn Context Injection</strong>: Before each agent turn, the active provider prefetches relevant memories based on the user's latest message and injects them into the system prompt context.</li>
@@ -48,33 +55,83 @@
 <li><strong>Agent Memory Tools</strong>: Provides the agent with specialized tools to search, update, or clear stored memories.</li>
 </ol>
 <hr />
-<h2>Supported Providers Breakdown</h2>
-<p>| Provider | Storage Architecture | Local / Open Source | Unique Strengths |
-| :--- | :--- | :--- | :--- |
-| <strong><a href="honcho.html">Honcho</a></strong> | Relational / Dynamic User Graph | Yes (Local Docker / SaaS) | AI-native user modeling, dialectic reasoning, and theory-of-mind plasticity. |
-| <strong><a href="mem0.html">Mem0</a></strong> | Vector + Structured Fact Layer | Yes (Local / Cloud) | Automated fact extraction, deduplication, and user/agent/session scoping. |
-| <strong>OpenViking</strong> | Tiered Context Storage | Yes (Self-hosted) | Multi-tier L0/L1/L2 loading designed to reduce context token usage by 80–90%. |
-| <strong>Holographic</strong> | Local SQLite Embedded DB | Yes (Local embedded) | Uses Holographic Reduced Representations (HRR) vector-symbolic algebra with zero cloud dependencies. |
-| <strong>RetainDB</strong> | Hybrid Database Index | Cloud / Self-hosted | Multi-modal hybrid search combining dense vectors, BM25 keyword matching, and rerankers. |
-| <strong>ByteRover</strong> | Markdown Knowledge Tree | Yes (Local / Cloud) | Hierarchical knowledge tree stored in human-readable Markdown with tiered retrieval pipelines. |
-| <strong>Hindsight</strong> | Reflective Knowledge Graph | Local / Cloud | Extracts discrete entity facts and performs multi-hop reflective reasoning over conversational history. |
-| <strong><a href="supermemory.html">Supermemory</a></strong> | Knowledge Graph + MCP Connectors | Yes (Local / Cloud) | Universal context engine connecting bookmarks, documents, and external apps. |</p>
+<h2 id="supported-providers-breakdown">Supported Providers Breakdown</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Provider</th>
+<th align="left">Storage Architecture</th>
+<th align="left">Local / Open Source</th>
+<th align="left">Unique Strengths</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong><a href="honcho.html">Honcho</a></strong></td>
+<td align="left">Relational / Dynamic User Graph</td>
+<td align="left">Yes (Local Docker / SaaS)</td>
+<td align="left">AI-native user modeling, dialectic reasoning, and theory-of-mind plasticity.</td>
+</tr>
+<tr>
+<td align="left"><strong><a href="mem0.html">Mem0</a></strong></td>
+<td align="left">Vector + Structured Fact Layer</td>
+<td align="left">Yes (Local / Cloud)</td>
+<td align="left">Automated fact extraction, deduplication, and user/agent/session scoping.</td>
+</tr>
+<tr>
+<td align="left"><strong>OpenViking</strong></td>
+<td align="left">Tiered Context Storage</td>
+<td align="left">Yes (Self-hosted)</td>
+<td align="left">Multi-tier L0/L1/L2 loading designed to reduce context token usage by 80–90%.</td>
+</tr>
+<tr>
+<td align="left"><strong>Holographic</strong></td>
+<td align="left">Local SQLite Embedded DB</td>
+<td align="left">Yes (Local embedded)</td>
+<td align="left">Uses Holographic Reduced Representations (HRR) vector-symbolic algebra with zero cloud dependencies.</td>
+</tr>
+<tr>
+<td align="left"><strong>RetainDB</strong></td>
+<td align="left">Hybrid Database Index</td>
+<td align="left">Cloud / Self-hosted</td>
+<td align="left">Multi-modal hybrid search combining dense vectors, BM25 keyword matching, and rerankers.</td>
+</tr>
+<tr>
+<td align="left"><strong>ByteRover</strong></td>
+<td align="left">Markdown Knowledge Tree</td>
+<td align="left">Yes (Local / Cloud)</td>
+<td align="left">Hierarchical knowledge tree stored in human-readable Markdown with tiered retrieval pipelines.</td>
+</tr>
+<tr>
+<td align="left"><strong>Hindsight</strong></td>
+<td align="left">Reflective Knowledge Graph</td>
+<td align="left">Local / Cloud</td>
+<td align="left">Extracts discrete entity facts and performs multi-hop reflective reasoning over conversational history.</td>
+</tr>
+<tr>
+<td align="left"><strong><a href="supermemory.html">Supermemory</a></strong></td>
+<td align="left">Knowledge Graph + MCP Connectors</td>
+<td align="left">Yes (Local / Cloud)</td>
+<td align="left">Universal context engine connecting bookmarks, documents, and external apps.</td>
+</tr>
+</tbody>
+</table>
 <hr />
-<h2>Configuration &amp; Usage</h2>
+<h2 id="configuration--usage">Configuration &amp; Usage</h2>
 <p>Hermes Agent allows selecting and switching memory providers via CLI or YAML configuration:</p>
-<h3>Interactive Setup</h3>
+<h3 id="interactive-setup">Interactive Setup</h3>
 <pre><code class="language-bash">hermes memory setup
 </code></pre>
-<h3>Check Memory Status</h3>
+<h3 id="check-memory-status">Check Memory Status</h3>
 <pre><code class="language-bash">hermes memory status
 </code></pre>
-<h3>Manual Configuration (<code>~/.hermes/config.yaml</code>)</h3>
+<h3 id="manual-configuration-hermesconfigyaml">Manual Configuration (<code>~/.hermes/config.yaml</code>)</h3>
 <pre><code class="language-yaml">memory:
   provider: &quot;honcho&quot; # Options: honcho, mem0, openviking, holographic, retaindb, byterover, hindsight, supermemory
   sync_enabled: true
   prefetch_limit: 5
 </code></pre>
-<h2>Related Concepts</h2>
+<h2 id="related-concepts">Related Concepts</h2>
 <ul>
 <li><a href="memory.html">LLM and Agent Memory</a> - Foundational agent memory concepts and cognitive taxonomy.</li>
 <li><a href="honcho.html">Honcho</a> - Dynamic user modeling and plasticity engine.</li>

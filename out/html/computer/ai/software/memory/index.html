@@ -6,6 +6,13 @@
 <title>Memory Systems</title>
 <link rel="alternate" type="text/markdown" href="index.md">
 <link rel="stylesheet" href="../../../../wiki.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script type="module">
+  import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js';
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  hljs.highlightAll();
+  mermaid.initialize({ startOnLoad: true });
+</script>
 </head>
 <body>
 <div class="header-actions">
@@ -21,10 +28,10 @@
   <span class="breadcrumb-separator">&gt;</span>
   <a href="../index.html">Software</a>
 </nav>
-<h1>Memory Systems</h1>
+<h1 id="memory-systems">Memory Systems</h1>
 <p>Overview and catalog of persistent memory engines, context managers, and stateful architectures for AI agents.</p>
 <p><a href="memory.html">LLM and Agent Memory</a> - LLM and Agent Memory refers to the software architectures, data structures, and algorithms that provide Large Language Model (LLM) agents with persistent, stateful, and adaptive context across interactions and time. While standard foundation models are stateless between API calls and traditional Retrieval-Augmented Generation (RAG) focuses on static document retrieval, agent memory systems enable continuous learning, self-updating user profiles, episodic recall, and procedural skill acquisition.</p>
-<h2>Articles</h2>
+<h2 id="articles">Articles</h2>
 <ul>
 <li><a href="cmem.html">Claude-Mem (cmem.ai)</a> - Claude-Mem (cmem.ai) is an open-source persistent memory system and context stream designed specifically for terminal coding agents and AI workflows, such as Claude Code, OpenClaw, and cursor-based environments. It captures tool executions, user decisions, file edits, and architectural constraints across development sessions, compressing and injecting relevant memories back into future agent turns.</li>
 <li><a href="cognee.html">Cognee</a> - Cognee is an open-source memory engine for AI applications and agents that organizes data into interconnected, topological knowledge graphs and vector embeddings. It bridges the gap between unstructured data ingestion and high-precision retrieval by transforming documents, conversations, and code into structured relational graphs enriched with semantic vectors.</li>

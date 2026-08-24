@@ -6,6 +6,13 @@
 <title>Letta</title>
 <link rel="alternate" type="text/markdown" href="letta.md">
 <link rel="stylesheet" href="../../../../wiki.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script type="module">
+  import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/es/highlight.min.js';
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  hljs.highlightAll();
+  mermaid.initialize({ startOnLoad: true });
+</script>
 </head>
 <body>
 <div class="header-actions">
@@ -23,9 +30,9 @@
   <span class="breadcrumb-separator">&gt;</span>
   <a href="index.html">LLM and Agent Memory</a>
 </nav>
-<h1>Letta</h1>
+<h1 id="letta">Letta</h1>
 <p>Letta (formerly MemGPT) is an open-source framework and runtime for building stateful AI agents with persistent, self-editing memory. Drawing inspiration from traditional operating system memory hierarchies, Letta enables LLMs to function as operating systems that manage their own context windows through virtual memory paging, tool calls, and archival search.</p>
-<pre><code class="language-mermaid">graph TD
+<pre class="mermaid">graph TD
     subgraph &quot;In-Context Working Memory&quot;
         SystemPrompt[System Instructions &amp; Persona]
         CoreMemory[Core Memory Block&lt;br/&gt;Persona &amp; Human Profile]
@@ -40,8 +47,8 @@
     CoreMemory &lt;--&gt;|core_memory_append / replace| Agent[LLM Agent Loop]
     Agent &lt;--&gt;|conversation_search| RecallStorage
     Agent &lt;--&gt;|archival_memory_insert / search| ArchivalStorage
-</code></pre>
-<h2>The OS Memory Paradigm</h2>
+</pre>
+<h2 id="the-os-memory-paradigm">The OS Memory Paradigm</h2>
 <p>Standard LLMs face a fundamental tradeoff: they are limited by context window sizes and forget everything once a session closes. Letta resolves this via a multi-tiered memory architecture:</p>
 <ol>
 <li><strong>Core Memory (In-Context)</strong>:
@@ -64,21 +71,21 @@
 </ul>
 </li>
 </ol>
-<h2>Key Characteristics</h2>
+<h2 id="key-characteristics">Key Characteristics</h2>
 <ul>
 <li><strong>Self-Editing State</strong>: The agent explicitly decides what to remember, modify, or page out of working context based on conversation developments.</li>
 <li><strong>Multi-Agent &amp; Multi-User Runtime</strong>: Provides a multi-tenant agent server with REST APIs, WebSocket support, and user isolation.</li>
 <li><strong>Local &amp; Self-Hostable</strong>: The complete Letta server runs locally via Docker or Python with SQLite/PostgreSQL and local embedding models (Ollama, vLLM).</li>
 <li><strong>Desktop UI &amp; CLI</strong>: Includes developer tools like <code>letta-code</code>, an interactive CLI, and an open-source desktop interface (<code>letta-oss-ui</code>).</li>
 </ul>
-<h2>CLI Quickstart</h2>
+<h2 id="cli-quickstart">CLI Quickstart</h2>
 <p>Install the Letta CLI:</p>
 <pre><code class="language-bash">npm i -g @letta-ai/letta-code
 </code></pre>
 <p>Start the Letta server and run a persistent agent:</p>
 <pre><code class="language-bash">letta run
 </code></pre>
-<h2>Related Concepts</h2>
+<h2 id="related-concepts">Related Concepts</h2>
 <ul>
 <li><a href="memory.html">LLM and Agent Memory</a> - Foundational agent memory concepts and cognitive taxonomy.</li>
 <li><a href="mem0.html">Mem0</a> - Vector-first intelligent memory layer.</li>
