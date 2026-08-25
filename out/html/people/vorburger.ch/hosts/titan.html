@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titan Host</title>
+<link rel="alternate" type="text/markdown" href="titan.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="titan.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/people/vorburger.ch/hosts/titan.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">People</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Michael Vorburger.ch</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Hosts</a>
+</nav>
+<h1 id="titan-host">Titan Host</h1>
+<p>Titan is a primary workstation host in the personal infrastructure of <a href="../vorburger.ch.html">Michael Vorburger.ch</a>.</p>
+<h2 id="overview">Overview</h2>
+<p>Configuration and details for the <code>titan</code> machine.</p>
+</body>
+</html>
