@@ -6,7 +6,19 @@
 <title>Mem0</title>
 <link rel="alternate" type="text/markdown" href="mem0.md">
 <link rel="stylesheet" href="../../../../wiki.css">
-<script defer src="../../../../wiki.js"></script>
+<script type="module" src="../../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
 </head>
 <body>
 <div class="header-actions">
