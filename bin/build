@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
-set -e
+set -eu -o pipefail
 
 ../enola2/enola2 mdfmt docs/
+
+if [ -d ../wiki-ui ]; then
+  (cd ../wiki-ui && direnv exec . bun run build)
+  cp ../wiki-ui/dist/wiki.css ../enola2/resources/web/wiki.css
+  cp ../wiki-ui/dist/wiki.js ../enola2/resources/web/wiki.js
+fi
 
 rm -rf out
 mkdir -p out/markdown out/html
