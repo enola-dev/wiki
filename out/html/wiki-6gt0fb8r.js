@@ -1,2 +1,0 @@
-import{U as z,V as K,W as L,X as J,Y as N,_ as T,na as X,oa as Y}from"./wiki-ahpj2bgc.js";var Z=class extends Y{static{z(this,"WardleyValueConverter")}runCustomConverter(B,q,I){switch(B.name.toUpperCase()){case"LINK_LABEL":return q.substring(1).trim();default:return}}},$={parser:{ValueConverter:z(()=>new Z,"ValueConverter")}};function b(B=N){let q=J(L(B),T),I=J(K({shared:q}),X,$);return q.ServiceRegistry.register(I),{shared:q,Wardley:I}}z(b,"createWardleyServices");
-export{$ as G,b as H};
