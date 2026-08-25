@@ -40,5 +40,6 @@ In standard non-Nix environments, developers often manage Bazel versions using l
 
 - [[https://bazel.build]]
 - [[https://github.com/bazelbuild/bazel]]
+- [[rules-java]]
 - [[bazelisk]]
 - [[../nix/nix]]

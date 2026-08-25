@@ -1,5 +1,7 @@
 # ToDo
 
+- [ ] Header should show paragraph sign character on hover, and allow to click to get #anchor in Browser Nav Bar
+
 - [ ] `out/` should be `.gitignore` and build should use the TBD Enola GitHub Action
 
 - [ ] Turn this into a SaaS? 🧓

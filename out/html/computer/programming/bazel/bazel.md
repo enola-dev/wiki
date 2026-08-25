@@ -40,5 +40,6 @@ In standard non-Nix environments, developers often manage Bazel versions using l
 
 - [{ Fast, Correct }: Choose two - Bazel Documentation](https://bazel.build)
 - [GitHub - bazelbuild/bazel: a fast, scalable, multi-language and extensible build system · GitHub](https://github.com/bazelbuild/bazel)
+- [Bazel Java Rules (rules_java)](rules-java.md)
 - [Bazelisk Launcher](bazelisk.md)
 - [Nix Package Manager](../nix/nix.md)

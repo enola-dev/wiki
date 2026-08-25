@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazel Java Rules (rules_java)</title>
+<link rel="alternate" type="text/markdown" href="rules-java.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="rules-java.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/programming/bazel/rules-java.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Programming</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Bazel Build System</a>
+</nav>
+<h1 id="bazel-java-rules-rules_java">Bazel Java Rules (rules_java)</h1>
+<p><code>rules_java</code> is the official Bazel rule set for compiling, testing, and packaging Java software within Bazel workspaces.</p>
+<h2 id="overview">Overview</h2>
+<p><code>rules_java</code> defines the core primitives for Java builds (<code>java_binary</code>, <code>java_library</code>, <code>java_test</code>, <code>java_toolchain</code>, <code>java_runtime</code>, etc.). By default, <code>rules_java</code> downloads and uses pre-compiled platform-specific helper binaries (<code>remote_java_tools_linux</code>, <code>remote_java_tools_darwin</code>, etc.) for packaging and bytecode manipulation tasks such as <code>singlejar</code> and <code>ijar</code>.</p>
+<h2 id="nixos-compatibility-and-prebuilt-toolchain-pitfalls">NixOS Compatibility and Prebuilt Toolchain Pitfalls</h2>
+<p>When running Bazel builds on <a href="../nix/nix.html">Nix Package Manager</a>, builds using the default <code>rules_java</code> configuration will fail when packaging JARs or compiling source JARs because the pre-built <code>singlejar_local</code> or <code>ijar</code> C++ binaries are dynamically linked against standard FHS glibc paths (such as <code>/lib64/ld-linux-x86-64.so.2</code>).</p>
+<h3 id="error-symptom">Error Symptom</h3>
+<pre><code class="language-text">ERROR: ... Building source jar ... failed: (Exit 127): singlejar_local failed: error executing JavaSourceJar command external/rules_java++toolchains+remote_java_tools_linux/java_tools/src/tools/singlejar/singlejar_local @...
+Could not start dynamically linked executable: external/rules_java++toolchains+remote_java_tools_linux/java_tools/src/tools/singlejar/singlejar_local
+NixOS cannot run dynamically linked executables intended for generic linux environments out of the box. For more information, see:
+https://nix.dev/permalink/stub-ld
+</code></pre>
+<h3 id="resolution-non-prebuilt-toolchain-configuration">Resolution: Non-Prebuilt Toolchain Configuration</h3>
+<p>To resolve this hermetically on NixOS without requiring system-wide FHS workarounds (like <code>nix-ld</code> or <code>buildFHSEnv</code>), configure Bazel to:</p>
+<ol>
+<li>Use the local host JDK provided by Nix on <code>PATH</code> / <code>JAVA_HOME</code>.</li>
+<li>Build helper binaries (<code>singlejar</code>, <code>ijar</code>, etc.) from source using <code>NONPREBUILT_TOOLCHAIN_CONFIGURATION</code>.</li>
+</ol>
+<h4 id="toolchain-definition-toolsjava_toolchainbuild">Toolchain Definition (<code>tools/java_toolchain/BUILD</code>)</h4>
+<pre><code class="language-python">load(
+    &quot;@bazel_tools//tools/jdk:default_java_toolchain.bzl&quot;,
+    &quot;NONPREBUILT_TOOLCHAIN_CONFIGURATION&quot;,
+    &quot;default_java_toolchain&quot;,
+)
+
+default_java_toolchain(
+    name = &quot;repository_default_java_toolchain&quot;,
+    configuration = NONPREBUILT_TOOLCHAIN_CONFIGURATION,
+    java_runtime = &quot;@bazel_tools//tools/jdk:current_host_java_runtime&quot;,
+    source_version = &quot;21&quot;,
+    target_version = &quot;21&quot;,
+)
+</code></pre>
+<h4 id="module-registration-modulebazel">Module Registration (<code>MODULE.bazel</code>)</h4>
+<pre><code class="language-python">bazel_dep(name = &quot;rules_java&quot;, version = &quot;9.3.0&quot;)
+
+register_toolchains(&quot;//tools/java_toolchain:repository_default_java_toolchain_definition&quot;)
+</code></pre>
+<h4 id="flag-configuration-bazelrc">Flag Configuration (<code>.bazelrc</code>)</h4>
+<pre><code class="language-text">common --java_language_version=21
+common --tool_java_language_version=21
+common --java_runtime_version=local_jdk_21
+common --tool_java_runtime_version=local_jdk_21
+common --action_env=JAVA_HOME
+</code></pre>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://github.com/bazelbuild/rules_java">GitHub - bazelbuild/rules_java: Java rules for Bazel · GitHub</a></li>
+<li><a href="bazel.html">Bazel Build System</a></li>
+<li><a href="../nix/nix.html">Nix Package Manager</a></li>
+</ul>
+</body>
+</html>
