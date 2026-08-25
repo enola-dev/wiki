@@ -5,8 +5,9 @@ set -eu -o pipefail
 
 if [ -d ../wiki-ui ]; then
   (cd ../wiki-ui && direnv exec . bun run build)
-  cp ../wiki-ui/dist/wiki.css ../enola2/resources/web/wiki.css
-  cp ../wiki-ui/dist/wiki.js ../enola2/resources/web/wiki.js
+  mkdir -p ../enola2/resources/web
+  rm -rf ../enola2/resources/web/*
+  cp -r ../wiki-ui/dist/* ../enola2/resources/web/
 fi
 
 rm -rf out
