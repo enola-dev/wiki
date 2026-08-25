@@ -42,6 +42,15 @@ A **Nix-enabled project** is a software repository structured to provide fully r
 
 In Nix-enabled projects, external version launchers like [[../bazel/bazelisk]] are replaced by declaring native tool packages directly in the `flake.nix` `devShells` definition.
 
+## Subprocess Execution and FHS Path Conventions
+
+On NixOS systems, standard Filesystem Hierarchy Standard (FHS) locations (such as `/usr/bin/echo`, `/usr/bin/cat`, `/usr/bin/head`, or `/usr/bin/tty`) do not exist; only `/usr/bin/env` is present in `/usr/bin/`.
+
+When implementing process launchers, pseudo-terminal handlers (e.g. `pty4j`), or unit tests:
+
+1. **Avoid Hardcoded FHS Paths**: Refer to command names directly (e.g., `echo`, `cat`, `tty`) or use `env` rather than hardcoding `/usr/bin/*`.
+2. **Propagate `PATH` in Custom Environments**: If a custom environment map is passed to subprocess builders without explicitly setting `PATH`, native process launchers will fail to locate binaries (often throwing generic `Exec_tty error` or logging `Unable to get $PATH`). Fall back to inheriting `System.getenv("PATH")` whenever a custom environment does not explicitly define `PATH`.
+
 ## References
 
 - [[https://nixos.org]]
