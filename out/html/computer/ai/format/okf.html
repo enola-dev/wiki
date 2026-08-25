@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Knowledge Format (OKF)</title>
+<link rel="alternate" type="text/markdown" href="okf.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="okf.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/ai/format/okf.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">AI</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">AI Formats</a>
+</nav>
+<h1 id="open-knowledge-format-okf">Open Knowledge Format (OKF)</h1>
+<p>The Open Knowledge Format (OKF) is an open, vendor-neutral specification for structuring persistent knowledge bases, metadata, and context for humans and AI agents.</p>
+<h2 id="overview">Overview</h2>
+<p>Originated by Google Cloud, OKF defines a minimal, file-based architecture where a <strong>Knowledge Bundle</strong> is represented as a directory hierarchy of standard CommonMark Markdown files with structured YAML frontmatter. It is designed to be authored by humans, maintained and synthesized by AI agents, and version-controlled via Git without requiring proprietary SDKs, databases, or runtime dependencies.</p>
+<h2 id="identifier-conventions">Identifier Conventions</h2>
+<p>OKF relies on standard filesystem paths and string conventions rather than centralized ID registries:</p>
+<h3 id="1-concept-ids">1. Concept IDs</h3>
+<ul>
+<li><strong>Definition</strong>: The unique identifier of a concept within a bundle is its file path relative to the bundle root, with the <code>.md</code> extension removed (for example, <code>people/vorburger.ch.md</code> becomes <code>people/vorburger.ch</code>).</li>
+<li><strong>Dot (<code>.</code>) Support</strong>: Concept IDs <strong>can contain dots</strong> (<code>.</code>). Dots are valid characters in filenames and slugs across standard filesystems, allowing concept identifiers to represent domain names (such as <code>people/vorburger.ch</code>), software versions (such as <code>standards/semver.2.0</code>), or dotted taxonomies.</li>
+<li><strong>Slug Hygiene</strong>: Slugs should consist of lowercase alphanumeric characters, hyphens (<code>-</code>), and dots (<code>.</code>). Special path sequences like directory traversal (<code>.</code> or <code>..</code>) and hidden files (leading dots like <code>.hidden.md</code>) must be avoided to ensure cross-platform portability and clean URL resolution.</li>
+</ul>
+<h3 id="2-source-ids-sourcesid">2. Source IDs (<code>sources[].id</code>)</h3>
+<ul>
+<li><strong>Definition</strong>: An optional key within a <code>sources</code> entry used for per-claim attribution and footnote citations in the document body.</li>
+<li><strong>Dot (<code>.</code>) Support</strong>: Source IDs can contain dots (for example, <code>id: rfc.9110</code> or <code>id: bq.schema.v1</code>).</li>
+</ul>
+<h3 id="3-actor-ids">3. Actor IDs</h3>
+<ul>
+<li><strong>Definition</strong>: Strings identifying entities that created, edited, or verified content in the <code>generated</code> or <code>verified</code> frontmatter blocks.</li>
+<li><strong>Conventions</strong>:
+<ul>
+<li>Agents: <code>&lt;producer&gt;/&lt;version&gt;</code> (e.g., <code>reference_agent/gemini-3.7-flash</code>).</li>
+<li>Humans: <code>human:&lt;id&gt;</code> (e.g., <code>human:/people/vorburger.ch</code>).</li>
+<li>Processes: <code>process:&lt;id&gt;</code> (e.g., <code>process:nightly-validator</code>).</li>
+</ul>
+</li>
+<li>Dots are commonly used within actor identifiers and paths.</li>
+</ul>
+<h2 id="document-structure--frontmatter">Document Structure &amp; Frontmatter</h2>
+<p>Every concept document consists of YAML frontmatter delimited by <code>---</code> and a Markdown body.</p>
+<h3 id="frontmatter-schema">Frontmatter Schema</h3>
+<ul>
+<li><code>type</code>: (<strong>Required</strong>) Short string identifying the kind of concept (e.g., <code>Specification</code>, <code>Software</code>, <code>Playbook</code>, <code>schema:Person</code>).</li>
+<li><code>resource</code>: Canonical URI identifying the underlying asset on the Web.</li>
+<li><code>generated</code>: Provenance object describing creation (<code>by: &lt;actor&gt;</code>, <code>at: &lt;iso8601-timestamp&gt;</code>).</li>
+<li><code>verified</code>: List of verification events (<code>by: &lt;actor&gt;</code>, <code>at: &lt;iso8601-timestamp&gt;</code>) establishing trust tiers.</li>
+<li><code>tags</code>: List of strings for cross-cutting categorization.</li>
+<li><code>sources</code>: List of materials the concept derives from, including credibility signals (<code>author</code>, <code>usage_count</code>, <code>last_modified</code>).</li>
+</ul>
+<h2 id="reserved-files--directory-layout">Reserved Files &amp; Directory Layout</h2>
+<p>To support progressive disclosure and bundle management, the following filenames have special meaning:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+<th>Frontmatter Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>index.md</code></td>
+<td>Auto-generated or static directory listing for progressive disclosure.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>log.md</code></td>
+<td>Chronological ledger of bundle changes and agent updates.</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>README.md</code></td>
+<td>Human-facing landing page rendered by Git hosts.</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://github.com/GoogleCloudPlatform/open-knowledge-format">GitHub - GoogleCloudPlatform/open-knowledge-format · GitHub</a></li>
+<li><a href="https://docs.enola.dev/specs/markdown-magic-link/">Markdown Magic Links - Enola.dev</a></li>
+<li><a href="../../../people/vorburger.ch.html">Michael Vorburger.ch</a></li>
+</ul>
+</body>
+</html>

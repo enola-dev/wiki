@@ -1,5 +1,7 @@
 # ToDo
 
+- [ ] `out/` should be `.gitignore` and build should use the TBD Enola GitHub Action
+
 - [ ] Turn this into a SaaS? 🧓
 
 - [ ] Store prompts and session trajectories alongside, and link to it from articles
