@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nix Package Manager</title>
+<link rel="alternate" type="text/markdown" href="nix.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="nix.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/programming/nix/nix.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Programming</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Nix Package Manager</a>
+</nav>
+<h1 id="nix-package-manager">Nix Package Manager</h1>
+<p>Nix is a purely functional package manager and build system that provides reproducible, declarative, and isolated software environments across Linux distributions and macOS.</p>
+<h2 id="nix-enabled-projects">Nix-Enabled Projects</h2>
+<p>A <strong>Nix-enabled project</strong> is a software repository structured to provide fully reproducible and automatic developer environments, defined by two key configuration files:</p>
+<ol>
+<li><strong><code>flake.nix</code></strong>: The declarative specification of the project's dependencies, development shells (<code>devShells.default</code>), build packages, and checks. Flakes provide locked input revisions via <code>flake.lock</code>, guaranteeing bit-for-bit reproducibility across workstations and CI runners.</li>
+<li><strong><code>.envrc</code> (for direnv)</strong>: A lightweight environment integration file containing <code>use flake</code> (or <code>use flake ./nix</code>). Combined with <a href="https://direnv.net">direnv</a>, it automatically loads and unloads the Nix development shell, environment variables, and tool paths whenever a developer navigates into or out of the project directory.</li>
+</ol>
+<h2 id="core-advantages">Core Advantages</h2>
+<ul>
+<li><strong>Hermetic Toolchains</strong>: Compilers, runtimes, and build tools (such as OpenJDK, Bun, and <a href="../bazel/bazel.html">Bazel Build System</a>) are installed into the immutable Nix store (<code>/nix/store/</code>) without polluting global operating system paths.</li>
+<li><strong>Zero Host Prerequisites</strong>: Developers and CI systems only require Nix and direnv installed; all project-specific tools, linters, and libraries are resolved automatically.</li>
+<li><strong>Declarative Development Shells</strong>: Tools and environment variables are versioned alongside the code in Git, preventing &quot;works on my machine&quot; discrepancies.</li>
+</ul>
+<h2 id="nix-and-build-tools">Nix and Build Tools</h2>
+<p>In Nix-enabled projects, external version launchers like <a href="../bazel/bazelisk.html">Bazelisk Launcher</a> are replaced by declaring native tool packages directly in the <code>flake.nix</code> <code>devShells</code> definition.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://nixos.org">Nix &amp; NixOS | Declarative builds and deployments</a></li>
+<li><a href="https://nix.dev/concepts/flakes">Flakes — nix.dev  documentation</a></li>
+<li><a href="https://direnv.net">direnv – unclutter your .profile | direnv</a></li>
+<li><a href="../bazel/bazel.html">Bazel Build System</a></li>
+<li><a href="../bazel/bazelisk.html">Bazelisk Launcher</a></li>
+</ul>
+</body>
+</html>

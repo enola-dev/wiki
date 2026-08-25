@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazelisk Launcher</title>
+<link rel="alternate" type="text/markdown" href="bazelisk.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="bazelisk.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/programming/bazel/bazelisk.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Programming</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Bazel Build System</a>
+</nav>
+<h1 id="bazelisk-launcher">Bazelisk Launcher</h1>
+<p>Bazelisk is a user-friendly launcher and wrapper for <a href="bazel.html">Bazel Build System</a> that automatically downloads and executes the requested Bazel version based on project configuration files or environment variables.</p>
+<h2 id="how-bazelisk-works">How Bazelisk Works</h2>
+<p>When executed, Bazelisk checks for the appropriate Bazel version in:</p>
+<ol>
+<li>The <code>USE_BAZEL_VERSION</code> environment variable.</li>
+<li>The <code>.bazelversion</code> file in the workspace directory.</li>
+<li>The latest stable release available upstream.</li>
+</ol>
+<p>Bazelisk then downloads the official pre-compiled upstream binary from GitHub Releases into the user cache directory (<code>~/.cache/bazelisk/downloads/...</code>) and executes it.</p>
+<h2 id="incompatibility-with-nix-enabled-projects">Incompatibility with Nix-Enabled Projects</h2>
+<p>For <a href="../nix/nix.html">Nix Package Manager</a> projects and systems running <a href="https://nixos.org">NixOS</a>, <strong>Bazelisk is not recommended</strong>.</p>
+<h3 id="dynamic-linker-mismatch">Dynamic Linker Mismatch</h3>
+<p>Official Bazel binary distributions downloaded by Bazelisk are compiled for generic Linux distributions and hardcode the standard ELF dynamic linker path (<code>/lib64/ld-linux-x86-64.so.2</code>). Because NixOS uses non-standard library paths in the Nix store without standard FHS locations, executing binaries downloaded by Bazelisk fails immediately with:</p>
+<pre><code class="language-text">Could not start dynamically linked executable: /home/.../.cache/bazelisk/downloads/.../bin/bazel
+NixOS cannot run dynamically linked executables intended for generic linux environments out of the box.
+For more information, see: https://nix.dev/permalink/stub-ld
+</code></pre>
+<h3 id="recommended-approach-direct-devshell-inclusion">Recommended Approach: Direct DevShell Inclusion</h3>
+<p>In a Nix-enabled project (such as one with <code>flake.nix</code>), Bazelisk should not be used. Instead, the appropriate Bazel package (e.g. <code>pkgs.bazel_8</code>) should simply be placed directly on the development shell (<code>devShells.default</code>):</p>
+<pre><code class="language-nix">packages = with pkgs; [
+  bazel_8
+];
+</code></pre>
+<p>This ensures that:</p>
+<ul>
+<li>The <code>bazel</code> binary on <code>PATH</code> is natively built, patched with <code>patchelf</code> to link against Nix store libraries, and runs reliably on NixOS and non-NixOS Linux distributions alike.</li>
+<li>Reproducibility and version pinning are declared declaratively in <code>flake.nix</code> and locked via <code>flake.lock</code>, eliminating the need for a separate <code>.bazelversion</code> file.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://github.com/bazelbuild/bazel">GitHub - bazelbuild/bazel: a fast, scalable, multi-language and extensible build system · GitHub</a></li>
+<li><a href="https://github.com/bazelbuild/bazelisk">GitHub - bazelbuild/bazelisk: A user-friendly launcher for Bazel. · GitHub</a></li>
+<li><a href="https://nix.dev/permalink/stub-ld">https://nix.dev/permalink/stub-ld</a></li>
+<li><a href="bazel.html">Bazel Build System</a></li>
+<li><a href="../nix/nix.html">Nix Package Manager</a></li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazel Build System</title>
+<link rel="alternate" type="text/markdown" href="bazel.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="bazel.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/programming/bazel/bazel.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Programming</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Bazel Build System</a>
+</nav>
+<h1 id="bazel-build-system">Bazel Build System</h1>
+<p>Bazel is an open-source, multi-language build and test tool designed for fast, reproducible, and hermetic software builds.</p>
+<h2 id="overview">Overview</h2>
+<p>Originally developed internally at Google as Blaze to support monorepos at planetary scale, Bazel constructs an explicit directed acyclic graph (DAG) of build actions. It ensures correctness by enforcing strict input isolation and sandboxing, guaranteeing that rebuilds only execute actions whose inputs or dependencies have changed.</p>
+<h2 id="key-features">Key Features</h2>
+<ul>
+<li><strong>Multi-Language Support</strong>: Builds targets across Java, C++, Go, Python, Rust, JavaScript, and custom rules via Starlark.</li>
+<li><strong>Hermeticity &amp; Reproducibility</strong>: Build steps operate in isolated sandboxes with explicit dependency graphs, preventing undeclared host tools or environment leakage.</li>
+<li><strong>High-Performance Caching</strong>: Supports local and distributed remote caching (<code>--remote_cache</code>) and distributed remote execution (RRE).</li>
+<li><strong>Dependency Management</strong>: Uses modern Bzlmod (<code>MODULE.bazel</code>) for external dependency resolution, alongside legacy WORKSPACE rules.</li>
+</ul>
+<h2 id="development-workflows">Development Workflows</h2>
+<p>In standard non-Nix environments, developers often manage Bazel versions using launcher tools like <a href="bazelisk.html">Bazelisk Launcher</a>. In <a href="../nix/nix.html">Nix Package Manager</a> projects, Bazel is provided directly via the development shell.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://bazel.build">{ Fast, Correct }: Choose two - Bazel Documentation</a></li>
+<li><a href="https://github.com/bazelbuild/bazel">GitHub - bazelbuild/bazel: a fast, scalable, multi-language and extensible build system · GitHub</a></li>
+<li><a href="bazelisk.html">Bazelisk Launcher</a></li>
+<li><a href="../nix/nix.html">Nix Package Manager</a></li>
+</ul>
+</body>
+</html>
