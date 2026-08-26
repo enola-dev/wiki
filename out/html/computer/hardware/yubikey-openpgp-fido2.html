@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YubiKey OpenPGP and FIDO2 Security Key Workflow</title>
+<link rel="alternate" type="text/markdown" href="yubikey-openpgp-fido2.md">
+<link rel="stylesheet" href="../../wiki.css">
+<script type="module" src="../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="yubikey-openpgp-fido2.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/hardware/yubikey-openpgp-fido2.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Hardware</a>
+</nav>
+<h1 id="yubikey-openpgp-and-fido2-security-key-workflow">YubiKey OpenPGP and FIDO2 Security Key Workflow</h1>
+<p>This document summarizes troubleshooting findings regarding repeated PIN prompts, smartcard session resets, and FIDO2 vs OpenPGP key workflows when using a YubiKey on Linux (NixOS).</p>
+<h2 id="openpgp-smartcard-pin-prompt-behavior">OpenPGP Smartcard PIN Prompt Behavior</h2>
+<p>When using a YubiKey for GnuPG (<code>pass</code>, GPG commit signing, or SSH via <code>gpg-agent</code>):</p>
+<h3 id="1-scdaemon-and-pcscd-conflicting-drivers">1. <code>scdaemon</code> and <code>pcscd</code> Conflicting Drivers</h3>
+<ul>
+<li>Putting both <code>disable-ccid</code> / <code>pcsc-shared</code> AND <code>shared-access</code> in <code>~/.gnupg/scdaemon.conf</code> breaks <code>scdaemon</code> with <code>No SmartCard daemon</code>.</li>
+<li><strong>Resolution</strong>: Use <code>disable-ccid</code> and <code>pcsc-shared</code> in <code>scdaemon.conf</code> so <code>scdaemon</code> routes card access through the system <code>pcscd</code> service without breaking parser options.</li>
+</ul>
+<h3 id="2-card-timeout-invalidating-pin-cache">2. Card Timeout Invalidating PIN Cache</h3>
+<ul>
+<li>Setting <code>card-timeout 1</code> in <code>scdaemon.conf</code> closes the smartcard hardware connection 1 second after every GPG operation.</li>
+<li><strong>Resolution</strong>: Closing the smartcard connection causes YubiKey hardware to reset its authenticated session, dropping the cached PIN in <code>gpg-agent</code>. Do not set short <code>card-timeout</code> values if PIN caching is desired.</li>
+</ul>
+<h3 id="3-openpgp-card-forcesig-setting">3. OpenPGP Card <code>forcesig</code> Setting</h3>
+<ul>
+<li>If <code>Signature PIN</code> is set to <code>forced</code> on the OpenPGP card (visible via <code>gpg --card-status</code>), the YubiKey hardware enforces fresh PIN entry for every signature operation (<code>git commit</code> / <code>git push</code>) regardless of <code>gpg-agent</code> cache configuration.</li>
+<li><strong>Resolution</strong>: Toggle <code>forcesig</code> off via <code>gpg --card-edit</code> -&gt; <code>admin</code> -&gt; <code>forcesig</code>.</li>
+</ul>
+<h3 id="4-openpgp-touch-policy-uif-hardware-requirement">4. OpenPGP Touch Policy (<code>UIF</code>) Hardware Requirement</h3>
+<ul>
+<li>If OpenPGP User Interaction Flag (UIF) / Touch Policy is set to <code>On (fixed)</code> (visible via <code>ykman openpgp info</code>), the OpenPGP card standard v2.1 chip specification ties PIN verification 1:1 to every hardware touch/signature request.</li>
+<li><strong>Consequence</strong>: <code>gpg-agent</code> cannot cache the PIN across operations when OpenPGP Touch is enabled; the card firmware demands fresh PIN authentication before accepting physical touch for each operation.</li>
+</ul>
+<h2 id="hardware-support-for-ssh-fido2-security-keys">Hardware Support for SSH FIDO2 Security Keys</h2>
+<p>To achieve <strong>&quot;Physical Touch per action, but PIN typed only once per session&quot;</strong>, standard SSH FIDO2 keys (<code>ed25519-sk</code> or <code>ecdsa-sk</code>) are preferred over OpenPGP SSH emulation.</p>
+<h3 id="firmware-version-limitations">Firmware Version Limitations</h3>
+<ul>
+<li><strong><code>ed25519-sk</code></strong>: Requires YubiKey firmware <strong>5.2.3 or higher</strong>. Attempting enrollment on older firmware yields: <code>Key enrollment failed: requested feature not supported</code>.</li>
+<li><strong><code>ecdsa-sk</code> (NIST P-256)</strong>: Supported on <strong>all YubiKey 5 series</strong> firmware (including version 5.1.2). Provides 128-bit cryptographic security equivalent to Ed25519, backed by hardware side-channel protection.</li>
+</ul>
+<h3 id="configuration--usage">Configuration &amp; Usage</h3>
+<ol>
+<li>Generate an <code>ecdsa-sk</code> SSH key:
+<pre><code class="language-bash">ssh-keygen -t ecdsa-sk -C &quot;yubikey-titan&quot;
+</code></pre>
+</li>
+<li>Configure <code>~/.ssh/config</code> to use the explicit identity:
+<pre><code class="language-text">Host github.com
+    IdentityFile ~/.ssh/id_ecdsa_sk
+    IdentitiesOnly yes
+</code></pre>
+</li>
+<li>Register <code>id_ecdsa_sk.pub</code> on GitHub. Outgoing Git pushes will trigger a green touch prompt on the YubiKey without demanding GPG PIN re-entry.</li>
+</ol>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="../programming/nix/nix.html">Nix Package Manager</a></li>
+</ul>
+</body>
+</html>
