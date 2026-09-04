@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enola Knowledge Format (EKF)</title>
+<link rel="alternate" type="text/markdown" href="ekf.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="ekf.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/ai/format/ekf.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">AI</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">AI Formats</a>
+</nav>
+<h1 id="enola-knowledge-format-ekf">Enola Knowledge Format (EKF)</h1>
+<p>The Enola Knowledge Format (EKF) is an open specification for organizing, interlinking, and maintaining persistent knowledge bases for humans and AI agents.</p>
+<h2 id="overview">Overview</h2>
+<p>EKF defines a file-based architecture for <strong>Knowledge Bundles</strong>—hierarchical collections of Markdown documents with structured metadata designed to be collaboratively curated by AI agents and humans, version-controlled via Git, and browsed online.</p>
+<p>The architecture and operational model of EKF are inspired by three foundational concepts:</p>
+<ul>
+<li><strong>Karpathy's LLM Wiki</strong>: Knowledge is persistent, cumulative, and compounding rather than repeatedly re-derived via ephemeral retrieval-augmented generation (RAG) queries.</li>
+<li><strong><a href="okf.html">Open Knowledge Format (OKF)</a></strong>: File-based knowledge bundles with YAML frontmatter capturing provenance, trust, and lifecycles without requiring proprietary databases or runtime dependencies.</li>
+<li><strong>Open Reasoning Format (ORF)</strong>: Structured procedural knowledge, playbooks, traps, and progressive disclosure for agent memory.</li>
+</ul>
+<h2 id="relationship-to-okf">Relationship to OKF</h2>
+<p>While EKF adopts OKF's core vision of file-based, Git-friendly knowledge bundles and frontmatter-based provenance and trust, EKF differs technically and syntactically in several key aspects:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Feature</th>
+<th align="left">Upstream OKF Specification (v0.2)</th>
+<th align="left">Enola Knowledge Format (EKF)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>Links &amp; References</strong></td>
+<td align="left">Standard CommonMark links with explicit paths and file extensions: <code>[Customers](/tables/customers.md)</code></td>
+<td align="left"><strong>Markdown Magic Links</strong>: <code>[[vector-search]]</code>, <code>[[https://...]]</code>. Forbids <code>.md</code> extensions and explicit labels (<code>[[ref|text]]</code>); titles are resolved dynamically from targets.</td>
+</tr>
+<tr>
+<td align="left"><strong>Frontmatter Metadata</strong></td>
+<td align="left">Recommends <code>title:</code> and <code>description:</code> in YAML frontmatter</td>
+<td align="left"><strong>Inferred from Content</strong>: <code>title:</code> and <code>description:</code> are omitted from frontmatter and derived directly from the first <code># H1</code> and the first paragraph.</td>
+</tr>
+<tr>
+<td align="left"><strong>Linked Data</strong></td>
+<td align="left">Arbitrary unstandardized frontmatter fields</td>
+<td align="left">Native <strong>YAML-LD</strong> (<code>@context</code>, Schema.org, Wikidata URIs) per the Markdown YAML-LD Frontmatter specification.</td>
+</tr>
+<tr>
+<td align="left"><strong>Directory Indexing</strong></td>
+<td align="left">Requires or allows checked-in <code>index.md</code> files for progressive disclosure</td>
+<td align="left"><strong>Strictly forbids checked-in <code>index.md</code></strong>. Category indexes are synthesized dynamically in memory during build.</td>
+</tr>
+<tr>
+<td align="left"><strong>Landing Pages &amp; Lead Concepts</strong></td>
+<td align="left">Standard directory tree without concept-directory binding</td>
+<td align="left">Optional source <code>README.md</code> (GitHub landing page) converted to <code>index.html</code>, and <strong>Topic Lead Concepts</strong> (<code>&lt;dir&gt;/&lt;dir&gt;.md</code>) whose summaries are hoisted into category preambles.</td>
+</tr>
+<tr>
+<td align="left"><strong>Markdown Quality</strong></td>
+<td align="left">Unconstrained CommonMark</td>
+<td align="left">Constrained by <strong><a href="well-formed-markdown.html">Well formed Markdown</a></strong> (strict heading hierarchy, list formatting, no broken links).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="bundle-architecture--directory-taxonomy">Bundle Architecture &amp; Directory Taxonomy</h2>
+<p>An EKF Knowledge Bundle is a directory tree of Markdown files organized by domain taxonomy:</p>
+<pre><code class="language-text">bundle-root/
+├── &lt;domain&gt;/              # Top-level subject area (e.g., computer, science, philosophy)
+│   ├── &lt;subdomain&gt;/       # Sub-topics (e.g., ai, systems, networks)
+│   │   ├── &lt;topic&gt;/       # Specialized area (e.g., software, hardware)
+│   │   │   ├── &lt;entity&gt;.md
+│   │   │   └── &lt;topic&gt;.md # Optional lead concept document
+</code></pre>
+<h3 id="file-and-directory-naming-rules">File and Directory Naming Rules</h3>
+<ul>
+<li>Slugs must use lowercase alphanumeric characters, hyphens, and dots (<code>kebab-case</code> or dotted identifiers, matching <code>^[a-z0-9]+([.-][a-z0-9]+)*$</code>).</li>
+<li>Name files descriptively after the core entity or concept (e.g., <code>vector-search.md</code>, <code>memory-architectures.md</code>).</li>
+<li>Avoid spaces and special characters.</li>
+<li><strong>Never check in <code>index.md</code> files</strong>: Category indexes are purely auto-generated build artifacts.</li>
+</ul>
+<h3 id="topic-lead-concepts-and-landing-pages">Topic Lead Concepts and Landing Pages</h3>
+<p>When organizing categories:</p>
+<ol>
+<li><strong>Source <code>README.md</code> (Optional Landing Page)</strong>:
+<ul>
+<li>A directory MAY contain an optional <code>README.md</code> so that Git repository hosts (such as GitHub) render a human-friendly landing page when browsing that folder.</li>
+<li><code>README.md</code> is never listed under <code>## Articles</code>. In the generated output bundle and HTML site, <code>README.md</code> is automatically converted to <code>index.md</code> / <code>index.html</code>.</li>
+<li>A directory must NEVER contain both <code>index.md</code> and <code>README.md</code>.</li>
+</ul>
+</li>
+<li><strong>Lead Concept Document (<code>&lt;dir&gt;/&lt;dir&gt;.md</code>)</strong>:
+<ul>
+<li>A directory MAY contain a concept document named identically to the directory itself (for example, <code>memory/memory.md</code>).</li>
+<li>This document serves as the foundational <strong>topic overview and architectural concept</strong> for that category, while sibling files describe specific implementations or sub-components.</li>
+</ul>
+</li>
+<li><strong>Progressive Disclosure &amp; Dynamic Index Presentation</strong>:
+<ul>
+<li>In accordance with OKF §8, category indexes (<code>index.md</code> / <code>index.html</code>) are generated dynamically during the build pipeline.</li>
+<li>When a source <code>README.md</code> exists, its H1 heading and intro text are used as the category title and preamble.</li>
+<li>When a matching <code>&lt;dir&gt;/&lt;dir&gt;.md</code> exists, its link and summary are placed into the preamble (merged after any custom intro prose from <code>README.md</code>).</li>
+<li>The lead concept (<code>[[memory]]</code>) and <code>README.md</code> are automatically omitted from the <code>## Articles</code> list to prevent duplicate indexing.</li>
+<li>If no matching <code>&lt;dir&gt;/&lt;dir&gt;.md</code> exists, all articles in that directory are listed under <code>## Articles</code>.</li>
+</ul>
+</li>
+</ol>
+<h2 id="markdown--linking-syntax">Markdown &amp; Linking Syntax</h2>
+<h3 id="well-formed-markdown-conformance">Well-formed Markdown Conformance</h3>
+<p>All documents must adhere to <a href="well-formed-markdown.html">Well formed Markdown</a> constraints:</p>
+<ul>
+<li>Must begin with a single Level 1 Heading (<code># Title</code>).</li>
+<li>Heading levels must increment sequentially without gaps (<code>#</code> -&gt; <code>##</code> -&gt; <code>###</code>).</li>
+<li>Headings must use <code>#</code> hash notation (not underline style).</li>
+<li>Unordered lists must use <code>-</code> dashes (not asterisks or pluses).</li>
+<li>Broken internal links are strictly forbidden.</li>
+</ul>
+<h3 id="markdown-magic-links-syntax">Markdown Magic Links Syntax</h3>
+<p>Inter-document references and external entity links MUST use Markdown Magic Links syntax (<code>[[...]]</code>):</p>
+<ol>
+<li><strong>Automatic Title Extraction (<code>[[URI-Reference]]</code>)</strong>:
+<ul>
+<li><code>[[second]]</code> automatically resolves the title from <code>second.md</code> (e.g., rendered as <code>[Second Article Title](second.md)</code>).</li>
+<li>Omit the <code>.md</code> extension: write <code>[[vector-search]]</code>, never <code>[[vector-search.md]]</code>.</li>
+</ul>
+</li>
+<li><strong>Relative Paths</strong>:
+<ul>
+<li>Always use relative paths for internal links. Do not use workspace-root prefixes (<code>[[¬/...]]</code>) or filesystem-root prefixes (<code>[[/...]]</code>).</li>
+</ul>
+</li>
+<li><strong>No Explicit Labels</strong>:
+<ul>
+<li>Explicit labels (<code>[[URI-Reference|Text]]</code>) are forbidden; link text is always derived automatically from the target's title.</li>
+</ul>
+</li>
+<li><strong>External URLs</strong>:
+<ul>
+<li>External URLs are written as <code>[[https://www.example.org]]</code> and resolve automatic link titles from the remote resource when supported by tooling.</li>
+</ul>
+</li>
+</ol>
+<h2 id="document-frontmatter">Document Frontmatter</h2>
+<p>Every concept document MUST include YAML frontmatter delimited by <code>---</code> at the beginning of the file.</p>
+<h3 id="schema-fields">Schema Fields</h3>
+<ul>
+<li><code>type</code>: (<strong>Required</strong>) Short string identifying the kind of concept (e.g., <code>Specification</code>, <code>Software</code>, <code>Playbook</code>, <code>schema:Person</code>).</li>
+<li><code>resource</code>: Canonical URI identifying the underlying asset on the Web. Omitted for purely abstract concepts.</li>
+<li><code>generated</code>: Provenance mapping describing creation (<code>by: &lt;actor&gt;</code>, <code>at: &lt;iso8601-timestamp&gt;</code>).</li>
+<li><code>verified</code>: List of verification events (<code>by: &lt;actor&gt;</code>, <code>at: &lt;iso8601-timestamp&gt;</code>).</li>
+<li><code>tags</code>: YAML list of short strings for cross-cutting taxonomy.</li>
+<li><code>sources</code>: List of materials the concept derives from, external or internal:
+<ul>
+<li><code>resource</code>: (<strong>Required</strong>) URI or relative link to the source.</li>
+<li><code>id</code>: Stable key used for per-claim attribution.</li>
+<li><code>title</code>: Human-readable label for the source.</li>
+<li><code>author</code>: Entity that produced the source.</li>
+<li><code>last_modified</code>: When the source itself last changed.</li>
+</ul>
+</li>
+<li><code>status</code>: Lifecycle state (<code>draft</code>, <code>deprecated</code>). For stable documents, the <code>status</code> field is omitted.</li>
+<li><code>updated</code>: Date of last significant update (<code>YYYY-MM-DD</code>).</li>
+</ul>
+<h3 id="omitted-frontmatter-fields-ast-inference">Omitted Frontmatter Fields (AST Inference)</h3>
+<p>Unlike standard OKF, EKF strictly omits the following keys from YAML frontmatter:</p>
+<ul>
+<li><code>title:</code> Omitted because it is inferred directly from the first <code># H1</code> heading in the Markdown AST.</li>
+<li><code>description:</code> Omitted because it is inferred directly from the first non-empty paragraph following the H1 heading.</li>
+</ul>
+<p>This eliminates synchronization errors between frontmatter and document body prose.</p>
+<h3 id="linked-data-yaml-ld">Linked Data (YAML-LD)</h3>
+<p>EKF natively supports Linked Data in YAML-LD format within the YAML frontmatter:</p>
+<ul>
+<li>Use <code>@context</code> to declare RDF namespaces (such as <code>schema: https://schema.org/</code> or <code>wikidata: https://www.wikidata.org/wiki/</code>).</li>
+<li>Use prefixed properties (such as <code>schema:givenName</code>, <code>schema:alumniOf</code>, <code>schema:sameAs</code>) to structure semantic knowledge.</li>
+</ul>
+<h3 id="complete-example">Complete Example</h3>
+<pre><code class="language-markdown">---
+type: Software
+resource: https://www.cognee.ai
+generated: { by: reference_agent/gemini-3.7-flash, at: 2026-08-23T15:41:05Z }
+verified:
+  - { by: human:/people/vorburger.ch, at: 2026-08-23T15:46:03Z }
+tags:
+  - ai
+  - memory
+  - agents
+sources:
+  - resource: https://docs.cognee.ai/
+    title: Cognee Documentation
+updated: &quot;2026-08-23&quot;
+---
+
+# Cognee AI Memory
+
+Cognee is an open-source framework for building persistent memory engines and knowledge graphs for AI agents.
+
+## Architecture
+
+Cognee structures unstructured data into knowledge graphs...
+</code></pre>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="okf.html">Open Knowledge Format (OKF)</a></li>
+<li><a href="well-formed-markdown.html">Well formed Markdown</a></li>
+<li><a href="https://docs.enola.dev/specs/markdown-magic-link/">https://docs.enola.dev/specs/markdown-magic-link/</a></li>
+<li><a href="https://docs.enola.dev/specs/markdown-yamlld-frontmatter/">https://docs.enola.dev/specs/markdown-yamlld-frontmatter/</a></li>
+<li><a href="https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f">https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f</a></li>
+<li><a href="https://github.com/glaforge/open-reasoning-format">https://github.com/glaforge/open-reasoning-format</a></li>
+<li><a href="https://github.com/GoogleCloudPlatform/open-knowledge-format">https://github.com/GoogleCloudPlatform/open-knowledge-format</a></li>
+</ul>
+</body>
+</html>

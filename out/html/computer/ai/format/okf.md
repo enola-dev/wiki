@@ -73,5 +73,5 @@ To support progressive disclosure and bundle management, the following filenames
 
 ## References
 
-- [GitHub - GoogleCloudPlatform/open-knowledge-format · GitHub](https://github.com/GoogleCloudPlatform/open-knowledge-format)
-- [Markdown Magic Links - Enola.dev](https://docs.enola.dev/specs/markdown-magic-link/)
+- [https://github.com/GoogleCloudPlatform/open-knowledge-format](https://github.com/GoogleCloudPlatform/open-knowledge-format)
+- [https://docs.enola.dev/specs/markdown-magic-link/](https://docs.enola.dev/specs/markdown-magic-link/)

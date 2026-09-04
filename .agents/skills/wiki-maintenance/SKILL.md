@@ -5,7 +5,7 @@ description: Validates and repairs Markdown documents in docs/ against AGENTS.md
 
 # Wiki Maintenance Skill
 
-This skill provides comprehensive validation and remediation procedures for maintaining the [Enola.dev](https://www.enola.dev) Knowledge Base in `docs/` according to [AGENTS.md](../../../AGENTS.md).
+This skill provides comprehensive validation and remediation procedures for maintaining the [Enola.dev](https://www.enola.dev) Knowledge Base in `docs/` according to the [Enola Knowledge Format (EKF)](../../../docs/computer/ai/format/ekf.md) and [AGENTS.md](../../../AGENTS.md).
 
 ## Quick Start / Automated Execution
 
@@ -36,7 +36,7 @@ When creating, editing, or reviewing documents under `docs/`, verify compliance 
   - Spaces, uppercase characters, and special characters are strictly forbidden.
   - Do NOT create or check in `index.md` files in `docs/`. Category indexes are auto-generated at build time (`bin/build`).
 
-### 2. Document Frontmatter (OKF & YAML-LD)
+### 2. Document Frontmatter (EKF & YAML-LD)
 
 Every `.md` file in `docs/` MUST start with a YAML frontmatter block enclosed by `---`:
 

@@ -21,7 +21,7 @@ except ImportError:
     HAS_YAML = False
 
 
-MAGIC_LINK_REGEX = re.compile(r"\[\[(.*?)\]\]")
+MAGIC_LINK_REGEX = re.compile(r"(```[\s\S]*?```|`[^`\n]*`)|\[\[(.*?)\]\]")
 H1_HEADING_REGEX = re.compile(r"^#\s+(.+)$", re.MULTILINE)
 SLUG_REGEX = re.compile(r"^[a-z0-9]+([.-][a-z0-9]+)*$")
 
@@ -240,7 +240,9 @@ class WikiLinter:
         # 3. Magic Links Validation
         def fix_magic_link(match):
             nonlocal modified_body
-            raw_target = match.group(1).strip()
+            if match.group(1) is not None:
+                return match.group(1)
+            raw_target = match.group(2).strip()
             fixed_target = raw_target
 
             # Check explicit label [[URI|Text]] -> forbidden

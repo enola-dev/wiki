@@ -5,7 +5,7 @@ generated: { by: human/vorburger.ch, at: 2026-08-28 }
 
 # Well formed Markdown
 
-Well formed Markdown constrains [Markdown](Markdown.md) to common conventions.
+Well formed Markdown constrains [Markdown](markdown.md) to common conventions.
 
 ## Example
 
