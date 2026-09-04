@@ -218,3 +218,11 @@ Periodically, or when touching related topics:
 - **Documentation Integrity**:
   - Preserve author notes, inline comments, and existing context when editing.
   - Avoid unnecessary rewrites of well-formulated documents; prefer additive synthesis and targeted improvements.
+
+---
+
+## 6. Git Commits and Push
+
+- **No Conventional Commit Prefixes**: There is NO need to use conventional commit prefixes (such as `docs:`, `docs(scope):`, `feat:`, `chore:`, etc.) in this repository. Write plain, clear, descriptive commit messages starting directly with a capital letter (e.g., `Document reftable format and Nix libgit2 compatibility`).
+- **Do NOT push automatically**: Do NOT automatically run `git push` after `git commit`. Push must only be done if explicitly instructed by the user.
+
