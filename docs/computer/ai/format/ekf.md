@@ -39,6 +39,7 @@ The Enola Knowledge Format (EKF) is an open specification for organizing, interl
 EKF defines a file-based architecture for **Knowledge Bundles**—hierarchical collections of Markdown documents with structured metadata designed to be collaboratively curated by AI agents and humans, version-controlled via Git, and browsed online.
 
 The architecture and operational model of EKF are inspired by three foundational concepts:
+
 - **Karpathy's LLM Wiki**: Knowledge is persistent, cumulative, and compounding rather than repeatedly re-derived via ephemeral retrieval-augmented generation (RAG) queries.
 - **[[okf]]**: File-based knowledge bundles with YAML frontmatter capturing provenance, trust, and lifecycles without requiring proprietary databases or runtime dependencies.
 - **Open Reasoning Format (ORF)**: Structured procedural knowledge, playbooks, traps, and progressive disclosure for agent memory.
@@ -47,14 +48,14 @@ The architecture and operational model of EKF are inspired by three foundational
 
 While EKF adopts OKF's core vision of file-based, Git-friendly knowledge bundles and frontmatter-based provenance and trust, EKF differs technically and syntactically in several key aspects:
 
-| Feature | Upstream OKF Specification (v0.2) | Enola Knowledge Format (EKF) |
-| :--- | :--- | :--- |
-| **Links & References** | Standard CommonMark links with explicit paths and file extensions: `[Customers](/tables/customers.md)` | **Markdown Magic Links**: `[[vector-search]]`, `[[https://...]]`. Forbids `.md` extensions and explicit labels (`[[ref\|text]]`); titles are resolved dynamically from targets. |
-| **Frontmatter Metadata** | Recommends `title:` and `description:` in YAML frontmatter | **Inferred from Content**: `title:` and `description:` are omitted from frontmatter and derived directly from the first `# H1` and the first paragraph. |
-| **Linked Data** | Arbitrary unstandardized frontmatter fields | Native **YAML-LD** (`@context`, Schema.org, Wikidata URIs) per the Markdown YAML-LD Frontmatter specification. |
-| **Directory Indexing** | Requires or allows checked-in `index.md` files for progressive disclosure | **Strictly forbids checked-in `index.md`**. Category indexes are synthesized dynamically in memory during build. |
-| **Landing Pages & Lead Concepts** | Standard directory tree without concept-directory binding | Optional source `README.md` (GitHub landing page) converted to `index.html`, and **Topic Lead Concepts** (`<dir>/<dir>.md`) whose summaries are hoisted into category preambles. |
-| **Markdown Quality** | Unconstrained CommonMark | Constrained by **[[well-formed-markdown]]** (strict heading hierarchy, list formatting, no broken links). |
+| Feature                           | Upstream OKF Specification (v0.2)                                                                      | Enola Knowledge Format (EKF)                                                                                                                                                     |
+| :-------------------------------- | :----------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Links & References**            | Standard CommonMark links with explicit paths and file extensions: `[Customers](/tables/customers.md)` | **Markdown Magic Links**: `[[vector-search]]`, `[[https://...]]`. Forbids `.md` extensions and explicit labels (`[[ref|text]]`); titles are resolved dynamically from targets.   |
+| **Frontmatter Metadata**          | Recommends `title:` and `description:` in YAML frontmatter                                             | **Inferred from Content**: `title:` and `description:` are omitted from frontmatter and derived directly from the first `# H1` and the first paragraph.                          |
+| **Linked Data**                   | Arbitrary unstandardized frontmatter fields                                                            | Native **YAML-LD** (`@context`, Schema.org, Wikidata URIs) per the Markdown YAML-LD Frontmatter specification.                                                                   |
+| **Directory Indexing**            | Requires or allows checked-in `index.md` files for progressive disclosure                              | **Strictly forbids checked-in `index.md`**. Category indexes are synthesized dynamically in memory during build.                                                                 |
+| **Landing Pages & Lead Concepts** | Standard directory tree without concept-directory binding                                              | Optional source `README.md` (GitHub landing page) converted to `index.html`, and **Topic Lead Concepts** (`<dir>/<dir>.md`) whose summaries are hoisted into category preambles. |
+| **Markdown Quality**              | Unconstrained CommonMark                                                                               | Constrained by **[[well-formed-markdown]]** (strict heading hierarchy, list formatting, no broken links).                                                                        |
 
 ## Bundle Architecture & Directory Taxonomy
 
@@ -99,6 +100,7 @@ When organizing categories:
 ### Well-formed Markdown Conformance
 
 All documents must adhere to [[well-formed-markdown]] constraints:
+
 - Must begin with a single Level 1 Heading (`# Title`).
 - Heading levels must increment sequentially without gaps (`#` -> `##` -> `###`).
 - Headings must use `#` hash notation (not underline style).
@@ -142,6 +144,7 @@ Every concept document MUST include YAML frontmatter delimited by `---` at the b
 ### Omitted Frontmatter Fields (AST Inference)
 
 Unlike standard OKF, EKF strictly omits the following keys from YAML frontmatter:
+
 - `title:` Omitted because it is inferred directly from the first `# H1` heading in the Markdown AST.
 - `description:` Omitted because it is inferred directly from the first non-empty paragraph following the H1 heading.
 
@@ -150,6 +153,7 @@ This eliminates synchronization errors between frontmatter and document body pro
 ### Linked Data (YAML-LD)
 
 EKF natively supports Linked Data in YAML-LD format within the YAML frontmatter:
+
 - Use `@context` to declare RDF namespaces (such as `schema: https://schema.org/` or `wikidata: https://www.wikidata.org/wiki/`).
 - Use prefixed properties (such as `schema:givenName`, `schema:alumniOf`, `schema:sameAs`) to structure semantic knowledge.
 
