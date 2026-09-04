@@ -1,0 +1,2 @@
+import{U as q,V as K,W as L,X as z,Y as N,_ as W,da as X,pa as Y,qa as Z}from"./wiki-ahpj2bgc.js";var b=class extends Z{static{q(this,"InfoTokenBuilder")}constructor(){super(["info","showInfo"])}},p={parser:{TokenBuilder:q(()=>new b,"TokenBuilder"),ValueConverter:q(()=>new Y,"ValueConverter")}};function A($=N){let w=z(L($),W),J=z(K({shared:w}),X,p);return w.ServiceRegistry.register(J),{shared:w,Info:J}}q(A,"createInfoServices");
+export{p as I,A as J};

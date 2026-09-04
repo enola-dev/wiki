@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git Reftable Storage Backend</title>
+<link rel="alternate" type="text/markdown" href="reftable.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="reftable.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/programming/git/reftable.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Programming</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Git Version Control System</a>
+</nav>
+<h1 id="git-reftable-storage-backend">Git Reftable Storage Backend</h1>
+<p>The Git <strong>reftable</strong> format is a binary, transactional storage backend for Git references (branches, tags) and reflogs, designed to replace traditional loose files and <code>packed-refs</code>.</p>
+<h2 id="architecture--motivation">Architecture &amp; Motivation</h2>
+<p>In standard Git repositories, references are stored as loose files under <code>.git/refs/</code> and periodically combined into <code>.git/packed-refs</code>. While simple, this architecture degrades on repositories containing tens or hundreds of thousands of refs, leading to file system directory thrashing, lock contention during concurrent reference updates, and linear scan overhead.</p>
+<p>Introduced in Git 2.45, the <code>reftable</code> format stores references in compact, indexed binary files inside <code>.git/reftable/</code>. When enabled, Git declares the extension in <code>.git/config</code>:</p>
+<pre><code class="language-ini">[extensions]
+	refstorage = reftable
+[core]
+	repositoryformatversion = 1
+</code></pre>
+<p>Per the Git repository specification, any Git client or library encountering an unrecognized extension under <code>[extensions]</code> must abort immediately to avoid corrupting reference metadata.</p>
+<h2 id="toolchain-incompatibilities--traps">Toolchain Incompatibilities &amp; Traps</h2>
+<p>While the native upstream <code>git</code> CLI (version 2.45+) fully supports reftables, secondary Git implementations and embedded libraries may not yet implement the specification.</p>
+<h3 id="libgit2-and-nix-flakes">Libgit2 and Nix Flakes</h3>
+<p>Nix uses <code>libgit2</code> to read and evaluate local Git repository inputs (such as <code>git+file://...</code> or <code>use flake</code> in <code>.envrc</code> via <code>direnv</code>). Because <code>libgit2</code> does not yet support <code>extensions.refstorage</code>, invoking Nix commands or <code>direnv allow</code> in a reftable repository aborts with:</p>
+<pre><code class="language-text">error: opening Git repository &quot;...&quot;: unsupported extension name extensions.refstorage (libgit2 error code = 6)
+</code></pre>
+<h3 id="developer-environments-and-ai-agent-runtimes">Developer Environments and AI Agent Runtimes</h3>
+<p>Toolchains that read <code>.git/HEAD</code> directly or rely on <code>libgit2</code> bindings (such as IDE Git status indicators or AI coding agent harnesses) may fail to resolve the current branch or report corrupted repository metadata when <code>reftable</code> is active.</p>
+<h2 id="remediation--workarounds">Remediation &amp; Workarounds</h2>
+<h3 id="migrating-an-existing-repository-to-files-backend">Migrating an Existing Repository to Files Backend</h3>
+<p>Existing repositories can be safely migrated back to the standard loose-files format without modifying commit history, branch pointers, or the working tree:</p>
+<pre><code class="language-bash">git refs migrate --ref-format=files
+</code></pre>
+<p>This command converts <code>.git/reftable/</code> records into standard <code>.git/refs/</code> and <code>.git/packed-refs</code>, and removes the <code>extensions.refstorage</code> entry from <code>.git/config</code>.</p>
+<h3 id="re-enabling-direnv-and-nix">Re-enabling Direnv and Nix</h3>
+<p>After completing the migration back to <code>files</code>, Nix and direnv will evaluate flakes normally:</p>
+<pre><code class="language-bash">direnv allow
+</code></pre>
+<h3 id="enforcing-the-traditional-files-format-globally">Enforcing the Traditional Files Format Globally</h3>
+<p>If a newer Git build or system-wide configuration defaults to <code>reftable</code> for newly initialized or cloned repositories, configure Git to default to the <code>files</code> backend:</p>
+<pre><code class="language-bash">git config --global init.defaultRefFormat files
+</code></pre>
+<h2 id="related-topics">Related Topics</h2>
+<ul>
+<li><a href="git.html">Git Version Control System</a></li>
+<li><a href="../nix/nix.html">Nix Package Manager</a></li>
+</ul>
+</body>
+</html>

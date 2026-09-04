@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git</title>
+<link rel="alternate" type="text/markdown" href="index.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="index.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/new/main/docs/computer/programming/git?filename=README.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Programming</a>
+</nav>
+<h1 id="git">Git</h1>
+<p><a href="git.html">Git Version Control System</a> - Git is a distributed version control system designed to track changes in source code with speed, data integrity, and support for distributed, non-linear workflows.</p>
+<h2 id="articles">Articles</h2>
+<ul>
+<li><a href="reftable.html">Git Reftable Storage Backend</a> - The Git reftable format is a binary, transactional storage backend for Git references (branches, tags) and reflogs, designed to replace traditional loose files and packed-refs.</li>
+</ul>
+</body>
+</html>

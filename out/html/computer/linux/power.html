@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power Management</title>
+<link rel="alternate" type="text/markdown" href="power.md">
+<link rel="stylesheet" href="../../wiki.css">
+<script type="module" src="../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="power.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/linux/power.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Linux</a>
+</nav>
+<h1 id="power-management">Power Management</h1>
+<h2 id="suspend">Suspend</h2>
+<p>Can't suspend machine anymore?</p>
+<pre><code>$ systemd-inhibit
+WHO            UID    USER      PID  COMM            WHAT                                                     WHY                                         MODE
+NetworkManager 0      root      2045 NetworkManager  sleep                                                    NetworkManager needs to turn off networks   delay
+Realtime Kit   0      root      2391 rtkit-daemon    sleep                                                    Demote realtime scheduling and stop canary. delay
+UPower         0      root      2588 upowerd         sleep                                                    Pause device polling                        delay
+GNOME Shell    674777 vorburger 5801 gnome-shell     sleep                                                    GNOME needs to lock the screen              delay
+GNOME Shell    674777 vorburger 5801 gnome-shell     sleep                                                    GNOME needs to save screen time data        delay
+vorburger      674777 vorburger 6064 gsd-media-keys  handle-power-key:handle-suspend-key:handle-hibernate-key GNOME handling keypresses                   block
+vorburger      674777 vorburger 6064 gsd-media-keys  sleep                                                    GNOME handling keypresses                   delay
+vorburger      674777 vorburger 6065 gsd-power       sleep                                                    GNOME needs to lock the screen              delay
+vorburger      674777 vorburger 5790 gnome-session-s sleep                                                    user session inhibited                      block
+
+$ gnome-session-inhibit -l
+No inhibitors
+
+$ gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type
+'nothing'
+
+$ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'suspend'
+</code></pre>
+<p>Suspend works again.</p>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git Version Control System</title>
+<link rel="alternate" type="text/markdown" href="git.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="git.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/programming/git/git.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Programming</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Git Version Control System</a>
+</nav>
+<h1 id="git-version-control-system">Git Version Control System</h1>
+<p>Git is a distributed version control system designed to track changes in source code with speed, data integrity, and support for distributed, non-linear workflows.</p>
+<h2 id="overview">Overview</h2>
+<p>Git tracks changes in a repository using a content-addressable object database (blobs, trees, commits, and tags) alongside a reference storage backend that maps human-readable branch names, tags, and <code>HEAD</code> to object IDs.</p>
+<h2 id="reference-storage-backends">Reference Storage Backends</h2>
+<p>Historically, Git stored references as individual loose files under <code>.git/refs/</code> and consolidated them into a <code>.git/packed-refs</code> file. Newer Git versions introduce alternative reference storage mechanisms:</p>
+<ul>
+<li><a href="reftable.html">Git Reftable Storage Backend</a>: A binary, transactional reference storage format designed for high performance and atomic updates in repositories with large numbers of refs.</li>
+</ul>
+<h2 id="related-topics">Related Topics</h2>
+<ul>
+<li><a href="../nix/nix.html">Nix Package Manager</a></li>
+</ul>
+</body>
+</html>

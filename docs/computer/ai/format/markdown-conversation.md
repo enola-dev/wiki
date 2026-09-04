@@ -5,7 +5,7 @@ generated: { by: human/vorburger.ch, at: 2026-08-28 }
 
 # Conversation Markdown
 
-Conversation Markdown is a convention how to format chat conversations in [[well-formed-markdown]]. 
+Conversation Markdown is a convention how to format chat conversations in [[well-formed-markdown]].
 
 It is useful to capture things such as:
 
@@ -56,6 +56,6 @@ Here is an illustration.
 ## ToDo
 
 1. Review this by an AI, ask it for opinion, request clarification if any, and research for any similar existing prior art
-1. Let AI deduct Rules from Example
-1. Write `Conversation.java` model
-1. Write generator & parser code
+2. Let AI deduct Rules from Example
+3. Write `Conversation.java` model
+4. Write generator & parser code

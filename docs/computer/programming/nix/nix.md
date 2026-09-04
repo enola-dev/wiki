@@ -69,4 +69,3 @@ See [[../git/reftable]] for details, diagnosis, and instructions for migrating t
 - [[../bazel/bazel]]
 - [[../bazel/bazelisk]]
 - [[../git/reftable]]
-

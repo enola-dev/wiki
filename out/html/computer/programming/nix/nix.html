@@ -57,6 +57,11 @@
 <li><strong>Avoid Hardcoded FHS Paths</strong>: Refer to command names directly (e.g., <code>echo</code>, <code>cat</code>, <code>tty</code>) or use <code>env</code> rather than hardcoding <code>/usr/bin/*</code>.</li>
 <li><strong>Propagate <code>PATH</code> in Custom Environments</strong>: If a custom environment map is passed to subprocess builders without explicitly setting <code>PATH</code>, native process launchers will fail to locate binaries (often throwing generic <code>Exec_tty error</code> or logging <code>Unable to get $PATH</code>). Fall back to inheriting <code>System.getenv(&quot;PATH&quot;)</code> whenever a custom environment does not explicitly define <code>PATH</code>.</li>
 </ol>
+<h2 id="git-flake-inputs-and-reference-storage-compatibility">Git Flake Inputs and Reference Storage Compatibility</h2>
+<p>When Nix evaluates flakes from a Git repository (such as <code>use flake</code> in <code>.envrc</code>), it relies on <code>libgit2</code> to parse the Git repository tree. Because <code>libgit2</code> does not yet implement Git's newer binary reference storage format (<code>reftable</code>), evaluating flakes in a repository with <code>extensions.refstorage = reftable</code> fails with:</p>
+<pre><code class="language-text">error: opening Git repository &quot;...&quot;: unsupported extension name extensions.refstorage (libgit2 error code = 6)
+</code></pre>
+<p>See <a href="../git/reftable.html">Git Reftable Storage Backend</a> for details, diagnosis, and instructions for migrating the repository back to the standard <code>files</code> format using <code>git refs migrate --ref-format=files</code>.</p>
 <h2 id="references">References</h2>
 <ul>
 <li><a href="https://nixos.org">Nix &amp; NixOS | Declarative builds and deployments</a></li>
@@ -64,6 +69,7 @@
 <li><a href="https://direnv.net">direnv – unclutter your .profile | direnv</a></li>
 <li><a href="../bazel/bazel.html">Bazel Build System</a></li>
 <li><a href="../bazel/bazelisk.html">Bazelisk Launcher</a></li>
+<li><a href="../git/reftable.html">Git Reftable Storage Backend</a></li>
 </ul>
 </body>
 </html>

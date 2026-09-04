@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Well formed Markdown</title>
+<link rel="alternate" type="text/markdown" href="well-formed-markdown.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="well-formed-markdown.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/ai/format/well-formed-markdown.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">AI</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">AI Formats</a>
+</nav>
+<h1 id="well-formed-markdown">Well formed Markdown</h1>
+<p>Well formed Markdown constrains <a href="Markdown.html">Markdown</a> to common conventions.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-markdown">---
+tags: [ example ]
+---
+# Example Conversation
+
+This is an example of [the Conversation Markdown format](https://wiki.enola.dev/computer/ai/format/markdown-conversation.html).
+
+## Sub-heading
+
+It's cool.
+</code></pre>
+<h2 id="rules">Rules</h2>
+<p>Well formed Markdown meets all of the following semantic rules.</p>
+<p>These rules are not configurable; related tools don't have any related opt-in / opt-out flags.</p>
+<ul>
+<li>WFMD-1: Broken Links are not allowed in well formed markdown</li>
+<li>WFMD-2: It may have YAML front matter</li>
+<li>WFMD-3: Must start with a heading 1</li>
+<li>WFMD-4: Heading Levels must consistently increment, and be without any gaps</li>
+</ul>
+<p>Well formed Markdown validation tools check (AKA <a href="https://en.wikipedia.org/wiki/Lint_(software)">lint</a>) MD, and emit diagnostics about rule violations, which humans or AI tools must fix.</p>
+<h2 id="format">Format</h2>
+<p>Well formed Markdown meets the following formatting rules:</p>
+<ul>
+<li>Hashtag instead of underline heading style</li>
+<li>Dash instead of asterisk or star unordered list style</li>
+</ul>
+<p>These rules are not validated, like the above semantic rules are. Instead, formatters automatically re-write markdown to meet these rules.</p>
+<h2 id="unspecified">Unspecified</h2>
+<p>Well formed Markdown does not impose any maximum line length.</p>
+<p>Bare URLs are allowed.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://github.com/davidanson/markdownlint"><code>davidanson/markdownlint</code></a> is a highly configurable checker (lint) tool for Markdown</li>
+</ul>
+<h2 id="todo">ToDo</h2>
+<ol>
+<li>Complement above for all <a href="https://github.com/davidanson/markdownlint#rules--aliases"><code>davidanson/markdownlint</code> rules</a></li>
+<li>Let AI compare this with and complement it from <a href="https://github.com/enola-dev/wiki/blob/main/AGENTS.md">https://github.com/enola-dev/wiki/blob/main/AGENTS.md</a> and <a href="https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md">https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md</a></li>
+<li>Review this by an AI, ask it for opinion, request clarification if any, and research for any similar existing prior art</li>
+<li>Let AI deduct all Rules from Example</li>
+<li>Code a <code>WellFormedMarkdownLinter.java</code></li>
+<li>Write a <a href="https://github.com/davidanson/markdownlint"><code>davidanson/markdownlint</code></a> rule set (see <a href="https://github.com/enola-dev/enola/blob/main/.markdownlint.yaml">enola's <code>.markdownlint.yaml</code></a>)</li>
+</ol>
+</body>
+</html>

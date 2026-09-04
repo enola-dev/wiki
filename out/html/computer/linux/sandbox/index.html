@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sandboxes</title>
+<link rel="alternate" type="text/markdown" href="index.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="index.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/linux/sandbox/README.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Linux</a>
+</nav>
+<h1 id="sandboxes">Sandboxes</h1>
+<p>Linux <em>sandboxes</em> provide process execution environments which are isolated from the host OS.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://developers.google.com/code-sandboxing">Google Developers Code Sandboxing Overview</a></li>
+</ul>
+<h2 id="subcategories">Subcategories</h2>
+<ul>
+<li><a href="cloud/index.html">Cloud Sandboxes</a> - Cloud Sandboxes provide cloud hosted sandbox environments.</li>
+</ul>
+</body>
+</html>

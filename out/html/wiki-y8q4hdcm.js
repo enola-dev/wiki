@@ -1,0 +1,2 @@
+import{nd as z}from"./wiki-f1txy54q.js";import{Hd as f}from"./wiki-xvj86xk5.js";import{Ge as O}from"./wiki-fs4np4zx.js";var M=O((q,A,K,Q)=>{q.attr("class",K);let{width:N,height:T,x:I,y:J}=L(q,A);z(q,T,N,Q);let $=X(I,J,N,T,A);q.attr("viewBox",$),f.debug(`viewBox configured: ${$} with padding: ${A}`)},"setupViewPortForSVG"),L=O((q,A)=>{let K=q.node()?.getBBox()||{width:0,height:0,x:0,y:0};return{width:K.width+A*2,height:K.height+A*2,x:K.x,y:K.y}},"calculateDimensionsWithPadding"),X=O((q,A,K,Q,N)=>{return`${q-N} ${A-N} ${K} ${Q}`},"createViewBox");
+export{M as ob};
