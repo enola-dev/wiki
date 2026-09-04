@@ -51,6 +51,16 @@ When implementing process launchers, pseudo-terminal handlers (e.g. `pty4j`), or
 1. **Avoid Hardcoded FHS Paths**: Refer to command names directly (e.g., `echo`, `cat`, `tty`) or use `env` rather than hardcoding `/usr/bin/*`.
 2. **Propagate `PATH` in Custom Environments**: If a custom environment map is passed to subprocess builders without explicitly setting `PATH`, native process launchers will fail to locate binaries (often throwing generic `Exec_tty error` or logging `Unable to get $PATH`). Fall back to inheriting `System.getenv("PATH")` whenever a custom environment does not explicitly define `PATH`.
 
+## Git Flake Inputs and Reference Storage Compatibility
+
+When Nix evaluates flakes from a Git repository (such as `use flake` in `.envrc`), it relies on `libgit2` to parse the Git repository tree. Because `libgit2` does not yet implement Git's newer binary reference storage format (`reftable`), evaluating flakes in a repository with `extensions.refstorage = reftable` fails with:
+
+```text
+error: opening Git repository "...": unsupported extension name extensions.refstorage (libgit2 error code = 6)
+```
+
+See [[../git/reftable]] for details, diagnosis, and instructions for migrating the repository back to the standard `files` format using `git refs migrate --ref-format=files`.
+
 ## References
 
 - [[https://nixos.org]]
@@ -58,3 +68,5 @@ When implementing process launchers, pseudo-terminal handlers (e.g. `pty4j`), or
 - [[https://direnv.net]]
 - [[../bazel/bazel]]
 - [[../bazel/bazelisk]]
+- [[../git/reftable]]
+
