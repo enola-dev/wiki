@@ -1,2 +1,0 @@
-import{U as q,V as J,W as K,X as z,Y as L,_ as N,ea as W,pa as X,qa as Y}from"./wiki-ahpj2bgc.js";var $=class extends Y{static{q(this,"PacketTokenBuilder")}constructor(){super(["packet"])}},b={parser:{TokenBuilder:q(()=>new $,"TokenBuilder"),ValueConverter:q(()=>new X,"ValueConverter")}};function A(Z=L){let w=z(K(Z),N),I=z(J({shared:w}),W,b);return w.ServiceRegistry.register(I),{shared:w,Packet:I}}q(A,"createPacketServices");
-export{b as K,A as L};
