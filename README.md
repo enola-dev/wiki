@@ -2,7 +2,7 @@
 
 This repository contains the public [Knowledge Base](https://en.wikipedia.org/wiki/Knowledge_base) (KB) by the [Enola.dev](https://www.enola.dev) community.
 
-Article sources live under the [docs/](docs/) directory and can be browsed online at [`wiki.enola.dev`](https://wiki.enola.dev).
+Article sources live under the [docs/](docs/) directory and can be browsed online at [`wiki.enola.dev`](https://wiki.enola.dev). (The CSS etc. is in the [`wiki-ui`](https://github.com/enola-dev/wiki-ui).)
 
 Its format is inspired by Karpathy's [LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f),
 Google's [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/open-knowledge-format),
