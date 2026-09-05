@@ -13,7 +13,9 @@ sources:
     title: "Bazel Java Rules Repository"
   - resource: https://nix.dev/permalink/stub-ld
     title: "NixOS Dynamic Linker Stub"
-updated: "2026-08-25"
+  - resource: https://github.com/enola-dev/enola/commit/0ffbdcf1a320abeafc12576653dd35c9c500281f
+    title: "Enola Fix for rules_java singlejar on NixOS"
+updated: "2026-09-05"
 ---
 
 # Bazel Java Rules (rules\_java)
@@ -80,6 +82,42 @@ common --tool_java_runtime_version=local_jdk_21
 common --action_env=JAVA_HOME
 ```
 
+### Pitfall: `java_single_jar` in `rules_jvm_external` Pinning
+
+While `NONPREBUILT_TOOLCHAIN_CONFIGURATION` configures standard `java_binary` and `java_library` targets to build `singlejar` from source, `rules_jvm_external` uses the `java_single_jar` rule (from `@rules_java//java:java_single_jar.bzl`) to package resolver plugins (e.g. `plugin-single-jar`) when generating dependencies with `REPIN=1 bazel run @maven//:pin`.
+
+`java_single_jar` hardcodes `_singlejar = Label("//toolchains:singlejar")` rather than obtaining `singlejar` from the active `java_toolchain`. In `@rules_java//toolchains/BUILD`, `:singlejar` unconditionally selects the prebuilt binary `@remote_java_tools_linux//:prebuilt_singlejar` (`singlejar_local`) on Linux x86\_64, which fails on NixOS with `Exit 127: stub-ld`.
+
+#### Resolution
+
+Patch `@rules_java` using Bzlmod `single_version_override` to direct `//toolchains:singlejar` to `@remote_java_tools//:singlejar_cc_bin`:
+
+```starlark
+single_version_override(
+    module_name = "rules_java",
+    patch_strip = 1,
+    patches = [
+        "//tools/patches:rules_java_singlejar.patch",
+    ],
+)
+```
+
+Where `rules_java_singlejar.patch` changes `@rules_java//toolchains/BUILD`:
+
+```diff
+--- a/toolchains/BUILD
++++ b/toolchains/BUILD
+@@ -227,7 +227,7 @@
+
+ alias(
+     name = "singlejar",
+-    actual = ":singlejar_prebuilt_or_cc_binary",
++    actual = "@remote_java_tools//:singlejar_cc_bin",
+ )
+```
+
+See [[https://github.com/enola-dev/enola/commit/0ffbdcf1a320abeafc12576653dd35c9c500281f]] for how this was implemented in Enola.
+
 ## Test Execution and Test Environment `PATH`
 
 When executing `java_test` targets on [[../nix/nix]] with `common --incompatible_strict_action_env` enabled, Bazel isolates the action environment with a stripped down `PATH` that does not include Nixpkgs' `bash`.
@@ -110,5 +148,6 @@ test --test_env=PATH
 ## References
 
 - [[https://github.com/bazelbuild/rules_java]]
+- [[https://github.com/enola-dev/enola/commit/0ffbdcf1a320abeafc12576653dd35c9c500281f]]
 - [[bazel]]
 - [[../nix/nix]]

@@ -79,6 +79,31 @@ common --java_runtime_version=local_jdk_21
 common --tool_java_runtime_version=local_jdk_21
 common --action_env=JAVA_HOME
 </code></pre>
+<h3 id="pitfall-java_single_jar-in-rules_jvm_external-pinning">Pitfall: <code>java_single_jar</code> in <code>rules_jvm_external</code> Pinning</h3>
+<p>While <code>NONPREBUILT_TOOLCHAIN_CONFIGURATION</code> configures standard <code>java_binary</code> and <code>java_library</code> targets to build <code>singlejar</code> from source, <code>rules_jvm_external</code> uses the <code>java_single_jar</code> rule (from <code>@rules_java//java:java_single_jar.bzl</code>) to package resolver plugins (e.g. <code>plugin-single-jar</code>) when generating dependencies with <code>REPIN=1 bazel run @maven//:pin</code>.</p>
+<p><code>java_single_jar</code> hardcodes <code>_singlejar = Label(&quot;//toolchains:singlejar&quot;)</code> rather than obtaining <code>singlejar</code> from the active <code>java_toolchain</code>. In <code>@rules_java//toolchains/BUILD</code>, <code>:singlejar</code> unconditionally selects the prebuilt binary <code>@remote_java_tools_linux//:prebuilt_singlejar</code> (<code>singlejar_local</code>) on Linux x86_64, which fails on NixOS with <code>Exit 127: stub-ld</code>.</p>
+<h4 id="resolution">Resolution</h4>
+<p>Patch <code>@rules_java</code> using Bzlmod <code>single_version_override</code> to direct <code>//toolchains:singlejar</code> to <code>@remote_java_tools//:singlejar_cc_bin</code>:</p>
+<pre><code class="language-starlark">single_version_override(
+    module_name = &quot;rules_java&quot;,
+    patch_strip = 1,
+    patches = [
+        &quot;//tools/patches:rules_java_singlejar.patch&quot;,
+    ],
+)
+</code></pre>
+<p>Where <code>rules_java_singlejar.patch</code> changes <code>@rules_java//toolchains/BUILD</code>:</p>
+<pre><code class="language-diff">--- a/toolchains/BUILD
++++ b/toolchains/BUILD
+@@ -227,7 +227,7 @@
+
+ alias(
+     name = &quot;singlejar&quot;,
+-    actual = &quot;:singlejar_prebuilt_or_cc_binary&quot;,
++    actual = &quot;@remote_java_tools//:singlejar_cc_bin&quot;,
+ )
+</code></pre>
+<p>See <a href="https://github.com/enola-dev/enola/commit/0ffbdcf1a320abeafc12576653dd35c9c500281f">dev: Fix &quot;REPIN=1 bazel run @maven//:pin&quot; on NixOS (see https://wiki.… · enola-dev/enola@0ffbdcf · GitHub</a> for how this was implemented in Enola.</p>
 <h2 id="test-execution-and-test-environment-path">Test Execution and Test Environment <code>PATH</code></h2>
 <p>When executing <code>java_test</code> targets on <a href="../nix/nix.html">Nix Package Manager</a> with <code>common --incompatible_strict_action_env</code> enabled, Bazel isolates the action environment with a stripped down <code>PATH</code> that does not include Nixpkgs' <code>bash</code>.</p>
 <h3 id="error-symptom-1">Error Symptom</h3>
@@ -96,6 +121,7 @@ test --test_env=PATH
 <h2 id="references">References</h2>
 <ul>
 <li><a href="https://github.com/bazelbuild/rules_java">GitHub - bazelbuild/rules_java: Java rules for Bazel · GitHub</a></li>
+<li><a href="https://github.com/enola-dev/enola/commit/0ffbdcf1a320abeafc12576653dd35c9c500281f">dev: Fix &quot;REPIN=1 bazel run @maven//:pin&quot; on NixOS (see https://wiki.… · enola-dev/enola@0ffbdcf · GitHub</a></li>
 <li><a href="bazel.html">Bazel Build System</a></li>
 <li><a href="../nix/nix.html">Nix Package Manager</a></li>
 </ul>
