@@ -65,6 +65,6 @@ This ensures that:
 
 - [GitHub - bazelbuild/bazel: a fast, scalable, multi-language and extensible build system · GitHub](https://github.com/bazelbuild/bazel)
 - [GitHub - bazelbuild/bazelisk: A user-friendly launcher for Bazel. · GitHub](https://github.com/bazelbuild/bazelisk)
-- [https://nix.dev/permalink/stub-ld](https://nix.dev/permalink/stub-ld)
+- [Frequently Asked Questions &#8212; nix.dev  documentation](https://nix.dev/permalink/stub-ld)
 - [Bazel Build System](bazel.md)
 - [Nix Package Manager](../nix/nix.md)
