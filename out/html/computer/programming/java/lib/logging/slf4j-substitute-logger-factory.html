@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLF4J SubstituteLoggerFactory Concurrency Quirk</title>
+<link rel="alternate" type="text/markdown" href="slf4j-substitute-logger-factory.md">
+<link rel="stylesheet" href="../../../../../wiki.css">
+<script type="module" src="../../../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="slf4j-substitute-logger-factory.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/programming/java/lib/logging/slf4j-substitute-logger-factory.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../../index.html">Programming</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Java</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Lib</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Logging</a>
+</nav>
+<h1 id="slf4j-substituteloggerfactory-concurrency-quirk">SLF4J SubstituteLoggerFactory Concurrency Quirk</h1>
+<p>In SLF4J 2.x, concurrent initialization can cause <code>LoggerFactory.getILoggerFactory()</code> to temporarily return a <code>SubstituteLoggerFactory</code> instead of the expected logging backend factory (such as Logback's <code>LoggerContext</code>), resulting in unexpected <code>ClassCastException</code> in multi-threaded environments.</p>
+<h2 id="problem-description">Problem Description</h2>
+<p>When bootstrapping a Java application or test suite that runs tests concurrently (such as JUnit 5 parallel execution), multiple threads may interact with logging simultaneously.</p>
+<p>If code attempts to cast the underlying <code>ILoggerFactory</code> to a concrete implementation:</p>
+<pre><code class="language-java">var context = (LoggerContext) LoggerFactory.getILoggerFactory();
+</code></pre>
+<p>A <code>ClassCastException</code> can be thrown intermittently:</p>
+<pre><code class="language-text">java.lang.ClassCastException: class org.slf4j.helpers.SubstituteLoggerFactory cannot be cast to class ch.qos.logback.classic.LoggerContext
+</code></pre>
+<h2 id="root-cause-analysis">Root Cause Analysis</h2>
+<p>In SLF4J 2.x, <code>org.slf4j.LoggerFactory</code> tracks its lifecycle via internal states: <code>UNINITIALIZED</code>, <code>ONGOING_INITIALIZATION</code>, <code>SUCCESSFUL_INITIALIZATION</code>, and <code>FAILED_INITIALIZATION</code>.</p>
+<p>When the first thread triggers SLF4J initialization:</p>
+<ol>
+<li><code>INITIALIZATION_STATE</code> transitions from <code>UNINITIALIZED</code> to <code>ONGOING_INITIALIZATION</code>.</li>
+<li>The initializing thread enters <code>performInitialization()</code>, which uses Java SPI (<code>ServiceLoader&lt;SLF4JServiceProvider&gt;</code>) to discover, instantiate, and initialize the provider (e.g. <code>LogbackServiceProvider</code>).</li>
+</ol>
+<p>During this window, if another thread calls <code>LoggerFactory.getILoggerFactory()</code>:</p>
+<ol>
+<li>It checks <code>if (INITIALIZATION_STATE == UNINITIALIZED)</code>. Because the state is <code>ONGOING_INITIALIZATION</code>, it bypasses synchronization on <code>LoggerFactory.class</code>.</li>
+<li>In the following switch statement, <code>case ONGOING_INITIALIZATION:</code> returns <code>SUBST_PROVIDER</code> (intended to support re-entrant logging on the initializing thread without deadlocks).</li>
+<li>As a result, the non-initializing thread immediately receives <code>SubstituteLoggerFactory</code> rather than waiting for initialization to finish.</li>
+</ol>
+<h2 id="resolution">Resolution</h2>
+<p>When programmatically configuring or accessing the backend context, do not assume <code>LoggerFactory.getILoggerFactory()</code> immediately returns the concrete factory during early startup. Instead, poll with a timeout when <code>SubstituteLoggerFactory</code> is encountered:</p>
+<pre><code class="language-java">private static LoggerContext getLoggerContext() {
+    var factory = LoggerFactory.getILoggerFactory();
+    if (factory instanceof SubstituteLoggerFactory) {
+        var sleeper = Sleeper.of(Duration.ofMillis(10), Duration.ofSeconds(5));
+        while (factory instanceof SubstituteLoggerFactory) {
+            sleeper.sleep(&quot;Timed out waiting for SLF4J initialization&quot;);
+            factory = LoggerFactory.getILoggerFactory();
+        }
+    }
+    if (factory instanceof LoggerContext context) {
+        return context;
+    }
+    throw new IllegalStateException(&quot;Expected LoggerContext but got &quot; + factory.getClass().getName());
+}
+</code></pre>
+</body>
+</html>
