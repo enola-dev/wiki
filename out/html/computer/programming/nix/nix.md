@@ -18,7 +18,7 @@ sources:
   - resource: https://direnv.net
     title: "direnv - unclutter your .profile"
     author: direnv
-updated: "2026-08-25"
+updated: "2026-09-28"
 ---
 
 # Nix Package Manager
@@ -50,6 +50,13 @@ When implementing process launchers, pseudo-terminal handlers (e.g. `pty4j`), or
 
 1. **Avoid Hardcoded FHS Paths**: Refer to command names directly (e.g., `echo`, `cat`, `tty`) or use `env` rather than hardcoding `/usr/bin/*`.
 2. **Propagate `PATH` in Custom Environments**: If a custom environment map is passed to subprocess builders without explicitly setting `PATH`, native process launchers will fail to locate binaries (often throwing generic `Exec_tty error` or logging `Unable to get $PATH`). Fall back to inheriting `System.getenv("PATH")` whenever a custom environment does not explicitly define `PATH`.
+
+## NSS User Resolution and OpenJDK `user.name` on Non-NixOS Hosts
+
+When running a Nix-packaged JVM (`nix develop`) on a non-NixOS Linux host that resolves user accounts via external Name Service Switch (NSS) modules (such as `libnss_cache`, `libnss_sss`, or corporate LDAP without `nscd`), or inside a container with an unmapped UID, `System.getProperty("user.name")` evaluates to `"?"`.
+
+- **Root Cause**: OpenJDK initializes `user.name` in native code (`java_props_md.c`) by calling `getpwuid(geteuid())` and defaulting to `"?"` when `getpwuid` returns `NULL`. Because the Nix OpenJDK binary is dynamically linked against Nix's isolated `glibc` (`/nix/store/...-glibc/lib`), it cannot load host-specific NSS shared libraries from `/lib/x86_64-linux-gnu/libnss_*.so.2` for UIDs absent from `/etc/passwd`.
+- **Resolution**: Treat `"?"` as an unresolved username in Java and fall back to standard POSIX environment variables (`System.getenv("USER")`, then `System.getenv("LOGNAME")`) before defaulting to a safe local identifier.
 
 ## Git Flake Inputs and Reference Storage Compatibility
 

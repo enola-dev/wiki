@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>exe.dev</title>
+<link rel="alternate" type="text/markdown" href="exe-dev.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="exe-dev.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/linux/sandbox/exe-dev.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Linux</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Sandboxes</a>
+</nav>
+<h1 id="exedev">exe.dev</h1>
+<p><a href="https://exe.dev/">exe.dev</a> offers computers for developers and agents with durable Sandboxes that are fast, secure, and sharable.</p>
+</body>
+</html>
