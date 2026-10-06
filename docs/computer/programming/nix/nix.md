@@ -34,13 +34,13 @@ A **Nix-enabled project** is a software repository structured to provide fully r
 
 ## Core Advantages
 
-- **Hermetic Toolchains**: Compilers, runtimes, and build tools (such as OpenJDK, Bun, and [[../bazel/bazel]]) are installed into the immutable Nix store (`/nix/store/`) without polluting global operating system paths.
+- **Hermetic Toolchains**: Compilers, runtimes, and build tools (such as OpenJDK, Bun, [[../gradle/gradle]], and [[../bazel/bazel]]) are installed into the immutable Nix store (`/nix/store/`) without polluting global operating system paths.
 - **Zero Host Prerequisites**: Developers and CI systems only require Nix and direnv installed; all project-specific tools, linters, and libraries are resolved automatically.
 - **Declarative Development Shells**: Tools and environment variables are versioned alongside the code in Git, preventing "works on my machine" discrepancies.
 
 ## Nix and Build Tools
 
-In Nix-enabled projects, external version launchers like [[../bazel/bazelisk]] are replaced by declaring native tool packages directly in the `flake.nix` `devShells` definition.
+In Nix-enabled projects, external version launchers like [[../bazel/bazelisk]] or the Gradle Wrapper (`./gradlew`) are replaced by declaring native tool packages directly in the `flake.nix` `devShells` definition.
 
 ## Subprocess Execution and FHS Path Conventions
 
@@ -75,4 +75,5 @@ See [[../git/reftable]] for details, diagnosis, and instructions for migrating t
 - [[https://direnv.net]]
 - [[../bazel/bazel]]
 - [[../bazel/bazelisk]]
+- [[../gradle/gradle]]
 - [[../git/reftable]]
