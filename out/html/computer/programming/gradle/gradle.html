@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gradle Build System</title>
+<link rel="alternate" type="text/markdown" href="gradle.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="gradle.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/programming/gradle/gradle.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Programming</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Gradle Build System</a>
+</nav>
+<h1 id="gradle-build-system">Gradle Build System</h1>
+<p>Gradle is an open-source build automation tool primarily used for JVM projects (Java, Kotlin, Scala) with declarative Kotlin DSL (<code>build.gradle.kts</code>) and Groovy DSL support, incremental compilation, build caching, and configuration caching.</p>
+<h2 id="caching-architecture">Caching Architecture</h2>
+<p>Gradle splits its persistent state across two directory trees:</p>
+<ol>
+<li><strong>Global User Home (<code>~/.gradle/</code>)</strong>:
+<ul>
+<li><code>~/.gradle/caches/modules-2/</code>: Downloaded external Maven/Ivy artifacts and metadata (<code>files-2.1/</code>).</li>
+<li><code>~/.gradle/caches/&lt;version&gt;/jars-9/</code>: Instrumented and transformed plugin and buildscript JARs loaded by Gradle's classloader hierarchy.</li>
+<li><code>~/.gradle/caches/&lt;version&gt;/kotlin-dsl/</code>: Compiled Kotlin DSL buildscript classes (<code>build.gradle.kts</code>, <code>settings.gradle.kts</code>).</li>
+<li><code>~/.gradle/caches/build-cache-1/</code>: Local task output build cache (<code>org.gradle.caching=true</code>).</li>
+<li><code>~/.gradle/daemon/&lt;version&gt;/</code>: Long-lived background <strong>Gradle Daemon</strong> JVM processes and lock registries.</li>
+</ul>
+</li>
+<li><strong>Project-Local Directory (<code>&lt;project&gt;/.gradle/</code>)</strong>:
+<ul>
+<li><code>&lt;project&gt;/.gradle/configuration-cache/</code>: Serialized task graphs and classloader scopes (<code>org.gradle.configuration-cache=true</code>).</li>
+<li><code>&lt;project&gt;/.gradle/&lt;version&gt;/</code>: Project-scoped incremental build state and file hashes.</li>
+</ul>
+</li>
+</ol>
+<h2 id="troubleshooting-deleting-gradlecaches-while-a-daemon-is-running">Troubleshooting: Deleting <code>~/.gradle/caches/</code> While a Daemon is Running</h2>
+<p>Manually deleting <code>$HOME/.gradle/caches/</code> while a background <strong>Gradle Daemon</strong> is still running — or while <code>&lt;project&gt;/.gradle/configuration-cache/</code> retains serialized state — causes subsequent builds to fail with <code>ClassNotFoundException</code> or <code>PluginInstantiationException</code> even after Gradle re-downloads the dependency JARs.</p>
+<h3 id="error-symptoms">Error Symptoms</h3>
+<ol>
+<li><strong>Missing Plugin Implementation Class (<code>PluginInstantiationException</code>)</strong>:</li>
+</ol>
+<pre><code class="language-text">* What went wrong:
+An exception occurred applying plugin request [id: 'org.graalvm.buildtools.native', version: '1.1.12']
+&gt; Could not find implementation class 'org.graalvm.buildtools.gradle.NativeImagePlugin' for plugin 'org.graalvm.buildtools.native' specified in jar:file:/home/.../.gradle/caches/modules-2/files-2.1/org.graalvm.buildtools/native-gradle-plugin/1.1.12/.../native-gradle-plugin-1.1.12.jar!/META-INF/gradle-plugins/org.graalvm.buildtools.native.properties.
+</code></pre>
+<ol start="2">
+<li><strong>Missing Compiled Buildscript Task Class in <code>VisitableURLClassLoader</code></strong>:</li>
+</ol>
+<pre><code class="language-text">* What went wrong:
+Error while reading task graph
+&gt; Exception while loading configuration for :common: Class 'Build_gradle$GenerateVersionTask' not found in class loader 'VisitableURLClassLoader(...)' of type 'org.gradle.internal.classloader.VisitableURLClassLoader'.
+</code></pre>
+<h3 id="root-cause">Root Cause</h3>
+<ul>
+<li>Gradle does <strong>not</strong> load plugin classes directly from the raw artifact in <code>~/.gradle/caches/modules-2/files-2.1/.../*.jar</code>. Instead, <code>InstrumentingClasspathFileTransformer</code> instruments plugin JARs into <code>~/.gradle/caches/&lt;version&gt;/jars-9/&lt;hash&gt;/*.jar</code>.</li>
+<li>The long-lived <strong>Gradle Daemon</strong> JVM caches both the JAR instrumentation mapping and the <code>VisitableURLClassLoader</code> instances in memory (<code>DefaultClassLoaderCache</code>) across builds.</li>
+<li>When <code>rm -r $HOME/.gradle/caches/</code> is executed while a daemon is alive:
+<ol>
+<li>On the next invocation, Gradle re-downloads the raw artifact into <code>~/.gradle/caches/modules-2/files-2.1/</code> and reads <code>META-INF/gradle-plugins/&lt;id&gt;.properties</code> to identify the plugin's implementation class name.</li>
+<li>However, the running daemon reuses its in-memory cached <code>ClassLoader</code> (or skips regenerating <code>~/.gradle/caches/&lt;version&gt;/jars-9/</code> because its in-memory cache believes the JAR was already instrumented), attempting to load classes from unlinked files in the deleted <code>jars-9/</code> or <code>kotlin-dsl/</code> directories.</li>
+<li>Additionally, if <code>org.gradle.configuration-cache=true</code> is enabled, <code>&lt;project&gt;/.gradle/configuration-cache/</code> stores references to those deleted <code>jars-9/</code> and <code>kotlin-dsl/</code> entries (and can even persist a broken configuration cache entry after a failed build).</li>
+</ol>
+</li>
+</ul>
+<h3 id="resolution">Resolution</h3>
+<p>Whenever clearing <code>~/.gradle/caches/</code>, always stop all running Gradle Daemons and remove the project-local <code>.gradle/</code> directory (especially <code>.gradle/configuration-cache/</code>):</p>
+<pre><code class="language-bash">gradle --stop
+rm -rf ~/.gradle/caches/ .gradle/
+</code></pre>
+<p>If using Nix and <code>direnv</code>:</p>
+<pre><code class="language-bash">direnv exec . gradle --stop
+rm -rf ~/.gradle/caches/ .gradle/
+</code></pre>
+<h2 id="related-topics">Related Topics</h2>
+<ul>
+<li><a href="../nix/nix.html">Nix Package Manager</a></li>
+<li><a href="../bazel/bazel.html">Bazel Build System</a></li>
+</ul>
+</body>
+</html>

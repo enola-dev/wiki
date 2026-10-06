@@ -34,13 +34,13 @@ A **Nix-enabled project** is a software repository structured to provide fully r
 
 ## Core Advantages
 
-- **Hermetic Toolchains**: Compilers, runtimes, and build tools (such as OpenJDK, Bun, and [Bazel Build System](../bazel/bazel.md)) are installed into the immutable Nix store (`/nix/store/`) without polluting global operating system paths.
+- **Hermetic Toolchains**: Compilers, runtimes, and build tools (such as OpenJDK, Bun, [Gradle Build System](../gradle/gradle.md), and [Bazel Build System](../bazel/bazel.md)) are installed into the immutable Nix store (`/nix/store/`) without polluting global operating system paths.
 - **Zero Host Prerequisites**: Developers and CI systems only require Nix and direnv installed; all project-specific tools, linters, and libraries are resolved automatically.
 - **Declarative Development Shells**: Tools and environment variables are versioned alongside the code in Git, preventing "works on my machine" discrepancies.
 
 ## Nix and Build Tools
 
-In Nix-enabled projects, external version launchers like [Bazelisk Launcher](../bazel/bazelisk.md) are replaced by declaring native tool packages directly in the `flake.nix` `devShells` definition.
+In Nix-enabled projects, external version launchers like [Bazelisk Launcher](../bazel/bazelisk.md) or the Gradle Wrapper (`./gradlew`) are replaced by declaring native tool packages directly in the `flake.nix` `devShells` definition.
 
 ## Subprocess Execution and FHS Path Conventions
 
@@ -75,4 +75,5 @@ See [Git Reftable Storage Backend](../git/reftable.md) for details, diagnosis, a
 - [direnv – unclutter your .profile | direnv](https://direnv.net)
 - [Bazel Build System](../bazel/bazel.md)
 - [Bazelisk Launcher](../bazel/bazelisk.md)
+- [Gradle Build System](../gradle/gradle.md)
 - [Git Reftable Storage Backend](../git/reftable.md)

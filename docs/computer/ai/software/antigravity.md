@@ -90,4 +90,3 @@ Managed agent interactions execute inside isolated, Google-hosted Linux sandboxe
   - `SourceType.GCS`: Copies a file or directory from a `gs://` Cloud Storage URI into `target` (up to 2 GB).
   - `SourceType.INLINE`: Writes inline text `content` directly to `target` (up to 1 MB per file, 2 MB total), useful for injecting `.agents/AGENTS.md` or `SKILL.md` files.
 - **Environment Lifecycle & Cleanup**: The created `Interaction` returns `interaction.environmentId()`, which can be passed into subsequent `CreateAgentInteraction` calls (`CreateAgentInteractionEnvironment.of(environmentId)`) to reuse the persistent filesystem across turns, or explicitly deleted via `client.environments.deleteEnvironment(environmentId)` when finished.
-

@@ -79,5 +79,48 @@
 <li><strong>Preventing Repo-Level Privilege Escalation</strong>: If repositories could declare their own permission bypasses or auto-approval rules in checked-in files, cloning an untrusted or malicious third-party repository could lead to arbitrary command execution, network exfiltration, or local file compromises without user consent.</li>
 <li><strong>Separation of Capabilities and Authorization</strong>: Collaborative assets such as custom agent instructions, rules, workflows, and tools are shared via the repository (in <code>AGENTS.md</code>, <code>GEMINI.md</code>, and <code>.agents/</code>), while actual permission authorizations remain strictly under the developer's local user-level control.</li>
 </ul>
+<h2 id="antigravity-java-sdk">Antigravity Java SDK</h2>
+<p>The <a href="https://github.com/glaforge/antigravity-java-sdk">Antigravity Java SDK</a> (<code>io.github.glaforge.antigravity:antigravity-sdk-wrapper</code>) provides a programmatic Java interface over the local Antigravity <code>localharness</code> binary via gRPC and Protocol Buffers.</p>
+<h3 id="api-key-resolution-gemini_api_key">API Key Resolution (<code>GEMINI_API_KEY</code>)</h3>
+<p>When instantiating <code>io.github.glaforge.antigravity.Agent</code>, <code>Agent.resolveGeminiApiKey()</code> resolves the Gemini API key used for both the <code>localharness</code> child process environment and the gRPC <code>GeminiAPIEndpoint</code> configuration in the following order:</p>
+<ol>
+<li>Java system property <code>System.getProperty(&quot;GEMINI_API_KEY&quot;)</code></li>
+<li>Process environment variable <code>System.getenv(&quot;GEMINI_API_KEY&quot;)</code></li>
+<li>A <code>.local.env</code> file in the current working directory (<code>GEMINI_API_KEY=...</code>)</li>
+</ol>
+<p>Passing <code>GEMINI_API_KEY</code> only via <code>AgentConfig.builder().environmentVariables(Map.of(&quot;GEMINI_API_KEY&quot;, ...))</code> is <strong>not</strong> sufficient on its own, because <code>resolveGeminiApiKey()</code> does not inspect <code>config.getEnvironmentVariables()</code> when configuring <code>GeminiAPIEndpoint</code> (falling back to <code>&quot;placeholder&quot;</code>). When bridging from another environment variable (such as <code>TEST_GEMINI_API_KEY</code>), set <code>System.setProperty(&quot;GEMINI_API_KEY&quot;, apiKey)</code> before constructing <code>new Agent(config)</code>.</p>
+<h3 id="workspace--project-context">Workspace &amp; Project Context</h3>
+<ul>
+<li><strong>Process Working Directory (<code>workspaceDir</code>)</strong>: Defaults to <code>Path.of(System.getProperty(&quot;user.dir&quot;))</code> (e.g., the Gradle subproject directory during test execution) and sets the <code>ProcessBuilder</code> working directory for <code>localharness</code>.</li>
+<li><strong>Harness Workspaces (<code>workspaces</code>)</strong>: Defaults to an empty list (<code>List.of()</code>). To declare <code>FilesystemWorkspace</code> entries in <code>HarnessConfig</code> for built-in file/grep tools and workspace containment, call <code>.addWorkspace(String)</code> or <code>.workspaces(List&lt;String&gt;)</code> on <code>AgentConfig.Builder</code>.</li>
+<li><strong>Model Endpoint</strong>: When using <code>GEMINI_API_KEY</code> (without a custom <code>baseUrl</code> or Vertex AI ADC), <code>localharness</code> connects directly to the Google AI Studio / Gemini Developer API via <code>GeminiAPIEndpoint</code>, billed/attributed to the project that owns the API key.</li>
+</ul>
+<h3 id="storage-isolation-vs-jetski-ui">Storage Isolation vs. Jetski UI</h3>
+<p>Conversations executed through <code>antigravity-java-sdk</code> do <strong>not</strong> appear in the local Jetski / Antigravity IDE UI because:</p>
+<ol>
+<li><strong>Separate Process</strong>: <code>Agent</code> spawns an isolated, headless <code>localharness</code> Go binary (<code>~/.antigravity/bin/&lt;slice&gt;/localharness</code>) over an ephemeral localhost WebSocket port rather than connecting to the running IDE daemon.</li>
+<li><strong>Separate Storage Directory (<code>saveDir</code>)</strong>: <code>AgentConfig.Builder</code> defaults <code>saveDir</code> to <code>${java.io.tmpdir}/antigravity-java</code> (e.g. <code>/tmp/antigravity-java/&lt;cascadeId&gt;.db</code>) and <code>appDataDir</code> to <code>&quot;&quot;</code>, whereas the Jetski UI stores its state under <code>~/.gemini/jetski</code>.</li>
+</ol>
+<h3 id="conversation-history--streaming">Conversation History &amp; Streaming</h3>
+<p>While <code>localharness</code> persists multi-turn state on disk in <code>&lt;saveDir&gt;/&lt;cascadeId&gt;.db</code> (resumable via <code>.conversationId(id)</code>), neither <code>localharness.proto</code> nor <code>Agent</code> exposes a read-back API to list historical messages from a <code>.db</code> file after the fact. Instead, conversation history can be captured in real time during each turn via:</p>
+<ul>
+<li><code>agent.streamChat(prompt)</code> (<code>AgentStream</code>), which provides <code>Flow.Publisher</code> streams for <code>chunks()</code> (<code>textDelta</code> and <code>thinkingDelta</code>), <code>thoughts()</code>, <code>toolCalls()</code>, and <code>result()</code> (<code>CompletableFuture&lt;AgentResponse&gt;</code> with <code>UsageMetadata</code>).</li>
+<li>Lifecycle hooks (<code>PreTurnHook</code>, <code>PostTurnHook</code>, <code>PreToolCallDecideHook</code>, <code>PostToolCallHook</code>, <code>OnToolErrorHook</code>, <code>OnCompactionHook</code>, <code>OnStopHook</code>) to capture tool calls, tool responses, and turn boundaries.</li>
+</ul>
+<h2 id="antigravity-managed-agent-gemini-interactions-api">Antigravity Managed Agent (Gemini Interactions API)</h2>
+<p>In addition to local execution via <code>localharness</code>, the <a href="https://ai.google.dev/gemini-api/docs/antigravity-agent">Antigravity Managed Agent</a> (<code>antigravity-preview-09-2026</code>) can be invoked remotely through the <a href="https://ai.google.dev/gemini-api/docs/interactions-overview">Gemini Interactions API</a> (<code>com.google.genai.gaos.models.interactions.CreateAgentInteraction</code> in <code>com.google.genai:google-genai</code>).</p>
+<h3 id="remote-sandbox-environments--sources">Remote Sandbox Environments &amp; Sources</h3>
+<p>Managed agent interactions execute inside isolated, Google-hosted Linux sandboxes (<a href="../../linux/sandbox/cloud/google-agent-environment.html">Google Cloud Gemini Agent Environments</a>):</p>
+<ul>
+<li><strong>Provisioning a New Remote Environment</strong>: Pass <code>CreateAgentInteractionEnvironment.of(&quot;remote&quot;)</code> for an empty sandbox, or <code>CreateAgentInteractionEnvironment.of(Environment)</code> to pre-mount sources and configure network egress.</li>
+<li><strong>Mounting Sources (<code>SourceType</code>)</strong>: <code>Environment.builder().sources(List&lt;Source&gt;)</code> supports pre-populating the sandbox before the agent loop starts:
+<ul>
+<li><code>SourceType.REPOSITORY</code>: Clones a Git repository from <code>source</code> URL into <code>target</code> (e.g., <code>/workspace/repo</code>, up to 500 MB).</li>
+<li><code>SourceType.GCS</code>: Copies a file or directory from a <code>gs://</code> Cloud Storage URI into <code>target</code> (up to 2 GB).</li>
+<li><code>SourceType.INLINE</code>: Writes inline text <code>content</code> directly to <code>target</code> (up to 1 MB per file, 2 MB total), useful for injecting <code>.agents/AGENTS.md</code> or <code>SKILL.md</code> files.</li>
+</ul>
+</li>
+<li><strong>Environment Lifecycle &amp; Cleanup</strong>: The created <code>Interaction</code> returns <code>interaction.environmentId()</code>, which can be passed into subsequent <code>CreateAgentInteraction</code> calls (<code>CreateAgentInteractionEnvironment.of(environmentId)</code>) to reuse the persistent filesystem across turns, or explicitly deleted via <code>client.environments.deleteEnvironment(environmentId)</code> when finished.</li>
+</ul>
 </body>
 </html>
