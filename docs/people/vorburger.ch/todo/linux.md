@@ -13,3 +13,8 @@ Linux setup, configuration, and maintenance tasks for [[../vorburger.ch]].
 ## Tasks
 
 - Initial Linux task list.
+
+## Related
+
+- [[../../../computer/linux/keybindings]]
+- [[../../../computer/linux/power]]

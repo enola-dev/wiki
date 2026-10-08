@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux and Terminal Keyboard Bindings</title>
+<link rel="alternate" type="text/markdown" href="keybindings.md">
+<link rel="stylesheet" href="../../wiki.css">
+<script type="module" src="../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="keybindings.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/linux/keybindings.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Linux</a>
+</nav>
+<h1 id="linux-and-terminal-keyboard-bindings">Linux and Terminal Keyboard Bindings</h1>
+<p>Keyboard shortcuts on Linux pass through multiple translation layers—from hardware scancodes and XKB/Wayland compositors, to terminal emulators (such as Kitty or Chrome's <code>hterm</code> / Secure Shell), down to terminal multiplexers (<code>tmux</code>) and TUI applications.</p>
+<h2 id="terminal-escape-sequences-and-non-ascii-key-combinations">Terminal Escape Sequences and Non-ASCII Key Combinations</h2>
+<p>Traditional Unix terminals communicate keystrokes over a pseudo-terminal (PTY) byte stream using ASCII and C0 control characters (<code>0x00</code>–<code>0x1F</code>). Because legacy control characters collapse several distinct physical keys into the same byte—for example, <code>Tab</code> and <code>Ctrl+I</code> both produce <code>0x09</code> (<code>\t</code>), while <code>Enter</code> and <code>Ctrl+M</code> both produce <code>0x0D</code> (<code>\r</code>)—combinations like <code>Ctrl+Tab</code> or <code>Ctrl+Shift+Tab</code> have no standard ASCII control code.</p>
+<p>To disambiguate modified keys without breaking legacy PTY compatibility, modern terminal emulators emit Control Sequence Introducer (CSI) sequences (such as xterm's <code>modifyOtherKeys</code> or the Kitty keyboard protocol):</p>
+<ul>
+<li><code>Ctrl+Tab</code>: <code>\x1b[1;5I</code> (or <code>\x1b[27;5;9~</code>)</li>
+<li><code>Ctrl+Backspace</code>: <code>\x17</code> (<code>^W</code>, word erase) or <code>\x08</code> (<code>^H</code>)</li>
+</ul>
+<h2 id="terminal-emulator-configuration">Terminal Emulator Configuration</h2>
+<h3 id="kitty">Kitty</h3>
+<p>In <code>kitty.conf</code>, arbitrary byte sequences can be emitted for any shortcut using <code>send_text</code>:</p>
+<pre><code class="language-ini">map ctrl+tab send_text all \x1b[1;5I
+map ctrl+backspace send_text all \x17
+</code></pre>
+<h3 id="chrome-secure-shell-nassh--hterm">Chrome Secure Shell (<code>nassh</code> / <code>hterm</code>)</h3>
+<p>Chrome's Secure Shell extension (<code>iodihamcpbpeioajjeobimgagajmlibd</code>) uses the <code>hterm</code> JavaScript terminal emulator.</p>
+<h4 id="why-ctrltab-fails-by-default-in-hterm">Why <code>Ctrl+Tab</code> Fails by Default in <code>hterm</code></h4>
+<p>In <code>hterm</code>'s built-in keymap (<code>hterm_keyboard_keymap.js</code>), pressing <code>Tab</code> (<code>keyCode 9</code>) with <code>Ctrl</code> invokes <code>onCtrlTab_</code>:</p>
+<ul>
+<li>When the <code>pass-ctrl-tab</code> preference (<em>&quot;Ctrl+Tab switch tab behavior&quot;</em>) is <code>true</code>, <code>hterm</code> returns <code>PASS</code>, letting Chrome switch browser tabs.</li>
+<li>When <code>pass-ctrl-tab</code> is <code>false</code> (the default), <code>hterm</code> returns <code>STRIP</code>, which strips the <code>Ctrl</code> modifier and sends a plain <code>\t</code> (<code>0x09</code>) to the remote host.</li>
+</ul>
+<p>As a result, remote applications like <code>tmux</code> only receive a standard <code>Tab</code> character unless overridden via <code>hterm</code>'s custom <code>keybindings</code> preference.</p>
+<h4 id="overriding-keybindings-in-nassh_preferences_editorhtml">Overriding Keybindings in <code>nassh_preferences_editor.html</code></h4>
+<p>In Secure Shell's Options (<code>chrome-extension://iodihamcpbpeioajjeobimgagajmlibd/html/nassh_preferences_editor.html</code>) under <strong>Terminal Settings → Keyboard → Keyboard bindings/shortcuts</strong> (<code>keybindings</code>), map <code>Ctrl+Tab</code> to emit <code>\x1b[1;5I</code>:</p>
+<pre><code class="language-json">{
+  &quot;Ctrl+Tab&quot;: &quot;'\u001b[1;5I'&quot;
+}
+</code></pre>
+<p>Two details are essential when configuring <code>hterm</code> <code>keybindings</code>:</p>
+<ul>
+<li><strong>Double-stage string parsing</strong>: <code>hterm</code> first parses the preference as JSON (which decodes <code>\u001b</code> into the literal <code>ESC</code> byte <code>0x1b</code>), and then passes the resulting string value (<code>'‹ESC›[1;5I'</code>) to <code>hterm.Parser.parseKeyAction()</code>. String actions in <code>hterm</code> must be enclosed in nested single or double quotes (<code>'...'</code> emits the enclosed characters literally).</li>
+<li><strong>Dedicated Window vs. Browser Tab</strong>: Chrome blocks web and extension pages from intercepting browser-level tab shortcuts (<code>Ctrl+Tab</code>, <code>Ctrl+W</code>, <code>Ctrl+T</code>, <code>Ctrl+N</code>) when running inside a standard browser tab (<a href="https://crbug.com/671774">crbug.com/671774</a>). Secure Shell must run in a dedicated standalone window (its default mode when launched from the extension popup, or via <code>?openas=window</code>) for <code>hterm</code> to receive <code>Ctrl+Tab</code>.</li>
+</ul>
+<h2 id="tmux-key-bindings-and-display-popup-traps">TMUX Key Bindings and <code>display-popup</code> Traps</h2>
+<h3 id="custom-escape-sequences-via-user-keys">Custom Escape Sequences via <code>user-keys</code></h3>
+<p>When a terminal emulator emits a raw CSI sequence like <code>\e[1;5I</code> for <code>Ctrl+Tab</code>, <code>tmux</code> can register that sequence as a custom <code>User0</code> key and bind it directly in <code>~/.tmux.conf</code>:</p>
+<pre><code class="language-tmux">set -s user-keys[0] &quot;\e[1;5I&quot;
+bind-key -n User0 display-popup -E -w 95% -h 40% &quot;tmux-window-popup.sh&quot;
+</code></pre>
+<h3 id="popup-disappearing-immediately-path-trap-in-display-popup--e">Popup Disappearing Immediately (<code>PATH</code> Trap in <code>display-popup -E</code>)</h3>
+<p>A common trap when binding a key to <code>tmux display-popup -E &quot;&lt;command&gt;&quot;</code> is that the popup frame flashes briefly and immediately closes.</p>
+<ul>
+<li><strong>Root Cause</strong>: The <code>-E</code> flag instructs <code>tmux</code> to close the popup automatically as soon as the command exits (regardless of exit code). Unlike interactive panes—which launch <code>default-command</code> (such as <code>fish</code>) and source interactive shell configurations—<code>tmux</code> executes <code>display-popup</code> and <code>run-shell</code> commands via non-interactive <code>/bin/sh</code> using the <code>tmux</code> server's global <code>PATH</code>. If a tool used by the popup script (such as <code>fzf</code> installed in <code>~/.fzf/bin</code> or via <a href="../programming/nix/nix.html">Nix Package Manager</a> in <code>~/.nix-profile/bin</code>) is only added to <code>PATH</code> in interactive shell startup files (<code>~/.bashrc</code> or Fish's <code>conf.d/</code>), the command fails with <code>command not found</code> in milliseconds and <code>display-popup -E</code> immediately closes the popup.</li>
+<li><strong>Resolution</strong>: Ensure both <code>~/.tmux.conf</code> (<code>tmux set-environment -g PATH ...</code>) and the popup script itself explicitly prepend user binary directories (<code>$HOME/.nix-profile/bin</code>, <code>$HOME/.fzf/bin</code>, <code>$HOME/.local/bin</code>) to <code>PATH</code>.</li>
+</ul>
+</body>
+</html>

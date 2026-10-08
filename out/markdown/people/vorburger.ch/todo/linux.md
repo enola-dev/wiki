@@ -13,3 +13,8 @@ Linux setup, configuration, and maintenance tasks for [Michael Vorburger.ch](../
 ## Tasks
 
 - Initial Linux task list.
+
+## Related
+
+- [Linux and Terminal Keyboard Bindings](../../../computer/linux/keybindings.md)
+- [Power Management](../../../computer/linux/power.md)
