@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evdev Mouse Click Telemetry Security on Wayland</title>
+<link rel="alternate" type="text/markdown" href="evdev-click-telemetry-security.md">
+<link rel="stylesheet" href="../../../wiki.css">
+<script type="module" src="../../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="evdev-click-telemetry-security.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/computer/linux/security/evdev-click-telemetry-security.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../../index.html">Computer</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Linux</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Security</a>
+</nav>
+<h1 id="evdev-mouse-click-telemetry-security-on-wayland">Evdev Mouse Click Telemetry Security on Wayland</h1>
+<p>Wayland screen recording tools capturing mouse click telemetry can safely read evdev mouse events without exposing keyboard keyloggers to unprivileged user sessions.</p>
+<h2 id="problem--background">Problem &amp; Background</h2>
+<p>Under Wayland, compositors isolate window inputs so unprivileged applications cannot snoop on global desktop events. While the FreeDesktop ScreenCast portal shares screen content and cursor coordinates as frame metadata, it intentionally does not stream mouse button presses or keyboard events.</p>
+<p>Applications like <a href="https://getopenscreen.com/">OpenScreen</a> that animate mouse clicks or render ripple effects bypass this portal limitation by reading left mouse button presses (<code>BTN_LEFT</code>) directly from the kernel <code>evdev</code> interface (<code>/dev/input/event*</code>).</p>
+<h2 id="the-security-risk-of-the-input-group">The Security Risk of the <code>input</code> Group</h2>
+<p>Because <code>/dev/input/event*</code> device nodes are owned by <code>root:input</code>, application installation guides commonly instruct users to add themselves to the group:</p>
+<pre><code class="language-bash">sudo usermod -aG input $USER
+</code></pre>
+<p>This presents a serious privilege leak:</p>
+<ul>
+<li><strong>Keylogger Vulnerability</strong>: The <code>input</code> group applies indiscriminately to all <code>/dev/input/</code> nodes—including all physical and virtual keyboards, power buttons, and authentication keys.</li>
+<li><strong>Ambient Authority</strong>: Once a user account joins <code>input</code>, every program executed by that user (web browsers, arbitrary npm/cargo dependencies, untrusted scripts) can open <code>/dev/input/</code> in the background and record every keystroke (passwords, encryption keys, and private messages).</li>
+</ul>
+<h2 id="safe-resolution-via-targeted-udev-uaccess">Safe Resolution via Targeted udev <code>uaccess</code></h2>
+<p>Instead of granting persistent, wide-ranging <code>input</code> group membership to the user, access can be restricted strictly to mouse devices using systemd's dynamic device seat ACLs (<code>uaccess</code>).</p>
+<h3 id="declarative-udev-rule">Declarative udev Rule</h3>
+<p>In NixOS or udev rules configuration (<code>/etc/udev/rules.d/70-mouse-uaccess.rules</code>):</p>
+<pre><code class="language-udev">KERNEL==&quot;event*&quot;, SUBSYSTEM==&quot;input&quot;, ENV{ID_INPUT_MOUSE}==&quot;1&quot;, ENV{ID_INPUT_KEYBOARD}!=&quot;1&quot;, TAG+=&quot;uaccess&quot;
+</code></pre>
+<h3 id="how-it-works">How It Works</h3>
+<ol>
+<li><strong>Strict Filtering</strong>: The rule checks <code>ENV{ID_INPUT_MOUSE}==&quot;1&quot;</code> and explicitly excludes any device acting as a keyboard (<code>ENV{ID_INPUT_KEYBOARD}!=&quot;1&quot;</code>).</li>
+<li><strong>Dynamic ACL Assignment</strong>: When matching, udev attaches <code>TAG+=&quot;uaccess&quot;</code>. Systemd's <code>systemd-logind</code> builtin then grants read/write POSIX ACLs (<code>setfacl</code>) on those specific mouse character devices exclusively to the currently active desktop seat user.</li>
+<li><strong>No Keyboards Exposed</strong>: Keyboards remain mode <code>0660 root:input</code> with no user ACLs, preventing any unprivileged user process from sniffing keystrokes.</li>
+<li><strong>No Group Management</strong>: The user does not need to be in the <code>input</code> group, and permissions automatically transfer across desktop login sessions without logouts or system reboots.</li>
+</ol>
+</body>
+</html>
