@@ -48,9 +48,69 @@
 <li><strong>Keylogger Vulnerability</strong>: The <code>input</code> group applies indiscriminately to all <code>/dev/input/</code> nodes—including all physical and virtual keyboards, power buttons, and authentication keys.</li>
 <li><strong>Ambient Authority</strong>: Once a user account joins <code>input</code>, every program executed by that user (web browsers, arbitrary npm/cargo dependencies, untrusted scripts) can open <code>/dev/input/</code> in the background and record every keystroke (passwords, encryption keys, and private messages).</li>
 </ul>
-<h2 id="safe-resolution-via-targeted-udev-uaccess">Safe Resolution via Targeted udev <code>uaccess</code></h2>
-<p>Instead of granting persistent, wide-ranging <code>input</code> group membership to the user, access can be restricted strictly to mouse devices using systemd's dynamic device seat ACLs (<code>uaccess</code>).</p>
-<h3 id="declarative-udev-rule">Declarative udev Rule</h3>
+<h2 id="threat-profile-comparison">Threat Profile Comparison</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Capability</th>
+<th align="center">Default Wayland</th>
+<th align="center">With Mouse udev <code>uaccess</code></th>
+<th align="center">With Scoped setgid Binary</th>
+<th align="center">With <code>sudo usermod -aG input</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>Keystrokes / Passwords</strong></td>
+<td align="center">🔒 Blocked</td>
+<td align="center">🔒 <strong>Blocked</strong></td>
+<td align="center">⚠️ Exposes attack surface (helper has group <code>input</code>)</td>
+<td align="center">🚨 <strong>Exposed to all user apps</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Global Mouse Clicks</strong></td>
+<td align="center">🔒 Blocked</td>
+<td align="center">⚠️ Readable by user apps</td>
+<td align="center">🔒 Blocked (only helper reads it)</td>
+<td align="center">⚠️ Readable by user apps</td>
+</tr>
+<tr>
+<td align="left"><strong>Relative Mouse Motion</strong></td>
+<td align="center">🔒 Blocked</td>
+<td align="center">⚠️ Readable by user apps</td>
+<td align="center">🔒 Blocked (only helper reads it)</td>
+<td align="center">⚠️ Readable by user apps</td>
+</tr>
+<tr>
+<td align="left"><strong>Synthetic Click Injection</strong></td>
+<td align="center">🔒 Blocked</td>
+<td align="center">🔒 <strong>Blocked</strong></td>
+<td align="center">🔒 Blocked</td>
+<td align="center">🔒 Blocked</td>
+</tr>
+<tr>
+<td align="left"><strong>Device Grab / Freeze</strong></td>
+<td align="center">🔒 Blocked</td>
+<td align="center">⚠️ Possible via <code>ioctl</code></td>
+<td align="center">🔒 Blocked</td>
+<td align="center">⚠️ Possible via <code>ioctl</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="architecture-decision-targeted-udev-vs-scoped-setgid">Architecture Decision: Targeted udev vs. Scoped setgid</h2>
+<p>When designing a secure solution, two architectures are possible:</p>
+<ol>
+<li><strong>Targeted udev <code>uaccess</code> (Recommended)</strong>: Grants dynamic ACLs on mouse event nodes exclusively to the active desktop session user.</li>
+<li><strong>Scoped setgid Wrapper</strong>: Creates a privileged binary (e.g. <code>owner = &quot;root&quot;</code>, <code>group = &quot;input&quot;</code>, mode <code>2750</code>) so only the helper binary runs with <code>input</code> privileges.</li>
+</ol>
+<h3 id="why-the-udev-route-is-the-recommended-choice">Why the udev Route is the Recommended Choice</h3>
+<p>The <strong>targeted udev route</strong> is the definitive, recommended solution:</p>
+<ul>
+<li><strong>Eliminates Privileged Binaries</strong>: Setgid/setuid binaries introduce privileged entry points on the host filesystem. With udev rules, no binary runs with elevated privileges.</li>
+<li><strong>Hardware-Level Keyboard Protection</strong>: The setgid wrapper approach still gives the helper binary access to the full <code>input</code> group, which includes all keyboards. If the helper executable suffers from a memory corruption bug or exploitation, it could be leveraged to read keystrokes. In contrast, the udev approach enforces hardware-level exclusion (<code>ENV{ID_INPUT_KEYBOARD}!=&quot;1&quot;</code>) in the kernel device subsystem—unprivileged userspace physically cannot open keyboard character devices.</li>
+<li><strong>Native Desktop Integration</strong>: It uses the same systemd-logind <code>uaccess</code> seat management infrastructure that securely grants user access to video capture cards (<code>/dev/video*</code>), DRM render nodes (<code>/dev/dri/*</code>), and audio devices (<code>/dev/snd/*</code>).</li>
+</ul>
+<h2 id="implementation-via-declarative-udev-rule">Implementation via Declarative udev Rule</h2>
 <p>In NixOS or udev rules configuration (<code>/etc/udev/rules.d/70-mouse-uaccess.rules</code>):</p>
 <pre><code class="language-udev">KERNEL==&quot;event*&quot;, SUBSYSTEM==&quot;input&quot;, ENV{ID_INPUT_MOUSE}==&quot;1&quot;, ENV{ID_INPUT_KEYBOARD}!=&quot;1&quot;, TAG+=&quot;uaccess&quot;
 </code></pre>
@@ -61,5 +121,10 @@
 <li><strong>No Keyboards Exposed</strong>: Keyboards remain mode <code>0660 root:input</code> with no user ACLs, preventing any unprivileged user process from sniffing keystrokes.</li>
 <li><strong>No Group Management</strong>: The user does not need to be in the <code>input</code> group, and permissions automatically transfer across desktop login sessions without logouts or system reboots.</li>
 </ol>
+<h2 id="references">References</h2>
+<ul>
+<li>Implementation in NixOS: <a href="https://nixfiles.vorburger.ch/reference/openscreen">NixOS OpenScreen Reference</a></li>
+<li>Upstream: <a href="https://getopenscreen.com/docs/installation/#linux">OpenScreen Linux Installation &amp; Platform Guide</a></li>
+</ul>
 </body>
 </html>

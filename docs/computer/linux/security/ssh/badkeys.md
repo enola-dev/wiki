@@ -1,3 +1,12 @@
+---
+type: resource
+tags:
+  - security
+  - ssh
+sources:
+  - https://badkeys.info
+---
+
 # Badkeys
 
 * [https://badkeys.info](https://badkeys.info)

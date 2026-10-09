@@ -7,4 +7,3 @@
 - [Hardware](hardware/index.md)
 - [Linux](linux/index.md)
 - [Programming](programming/index.md)
-- [Security](security/index.md)
