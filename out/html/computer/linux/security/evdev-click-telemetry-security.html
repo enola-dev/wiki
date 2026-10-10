@@ -122,6 +122,7 @@ KERNEL==&quot;event*&quot;, SUBSYSTEM==&quot;input&quot;, ENV{ID_INPUT_TOUCHPAD}
 <li><strong>Dynamic ACL Assignment</strong>: When matching, udev attaches <code>TAG+=&quot;uaccess&quot;</code>. Systemd's <code>systemd-logind</code> builtin then grants read/write POSIX ACLs (<code>setfacl</code>) on those specific mouse character devices exclusively to the currently active desktop seat user.</li>
 <li><strong>No Keyboards Exposed</strong>: Keyboards remain mode <code>0660 root:input</code> with no user ACLs, preventing any unprivileged user process from sniffing keystrokes.</li>
 <li><strong>No Group Management</strong>: The user does not need to be in the <code>input</code> group, and permissions automatically transfer across desktop login sessions without logouts or system reboots. To apply to already-connected devices immediately without re-plugging, run <code>sudo udevadm trigger --subsystem-match=input</code>.</li>
+<li><strong>Targeting <code>event*</code> vs. Legacy <code>mouse*</code></strong>: The rule specifically matches <code>KERNEL==&quot;event*&quot;</code> (the modern kernel evdev interface) rather than legacy PS/2 <code>mouse*</code> emulation devices (<code>/dev/input/mouse*</code>), ensuring that only the structured evdev stream required by applications is exposed.</li>
 </ol>
 <h2 id="references">References</h2>
 <ul>
