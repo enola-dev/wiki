@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Demo Video Screen Cast</title>
+<link rel="alternate" type="text/markdown" href="screen-cast.md">
+<link rel="stylesheet" href="../../wiki.css">
+<script type="module" src="../../wiki.js"></script>
+<script>
+  if (location.protocol === 'file:') {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('pre.mermaid').forEach(el => {
+        const msg = document.createElement('p');
+        msg.className = 'mermaid-file-warning';
+        msg.textContent = 'Please serve this page over HTTP instead of file://';
+        el.replaceWith(msg);
+      });
+    });
+  }
+</script>
+</head>
+<body>
+<div class="header-actions">
+  <a class="action-button md-button" href="screen-cast.md">Markdown</a>
+  <a class="action-button edit-button" href="https://github.com/enola-dev/wiki/edit/main/docs/marketing/video/screen-cast.md" target="_blank">Edit</a>
+</div>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="../../index.html">Home</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="../index.html">Marketing</a>
+  <span class="breadcrumb-separator">&gt;</span>
+  <a href="index.html">Video</a>
+</nav>
+<h1 id="marketing-demo-video-screen-cast">Marketing Demo Video Screen Cast</h1>
+<!-- based on https://gemini.google.com/app/11b0abc9c693b376 and related conversations -->
+<h2 id="tools">Tools</h2>
+<p><a href="https://getopenscreen.com">https://getopenscreen.com</a> is great!</p>
+<h2 id="length">Length</h2>
+<p>For hero landing pages, keep it concise (ideally under 8–15s; grand max. 30-40s), looping smoothly on the core &quot;aha!&quot; moment.</p>
+<p>Alternatively, show a crisp poster image with a &quot;Watch 40s Demo&quot; play button that opens a modal player (or embeds Vimeo/YouTube/Wistia/native video with transport controls) so the heavy file is fetched only on demand.</p>
+<h2 id="record">Record</h2>
+<p>Record e.g. web browsers on fullscreen (F11) - in 16:9 from a 4k screen.</p>
+<p>Zoom &gt;=200% in the browser (not later on OpenScreen; that too, separately).</p>
+<h2 id="export">Export</h2>
+<p>Export from OpenScreen in:</p>
+<ul>
+<li>1080p (1920x1080) Quality Resolution</li>
+<li>30 FPS</li>
+</ul>
+<h2 id="audio">Audio</h2>
+<p>Narrate what's going on, and use OpenScreen's cool Transcript Captions.</p>
+<p>If needed, until <a href="https://github.com/getopenscreen/openscreen/issues/1104">openscreen#1104</a>, remove the audio track like this:</p>
+<pre><code>ffmpeg -i input.mp4 -c:v copy -an output.mp4
+</code></pre>
+<h2 id="mp4">MP4</h2>
+<pre><code>ffmpeg -i input.mp4 -c:v libx264 -crf 23 -preset slow -an -movflags +faststart input-optimized23.mp4
+</code></pre>
+<p>or with slightly lower quality for smaller file size:</p>
+<pre><code>ffmpeg -i input.mp4 -c:v libx264 -crf 24 -preset slow -an -movflags +faststart input-optimized24.mp4
+</code></pre>
+<h2 id="poster">Poster</h2>
+<pre><code>ffmpeg -ss 00:00:00.500 -i input.mp4 -frames:v 1 -q:v 80 input-poster.webp
+</code></pre>
+<h2 id="html">HTML</h2>
+<pre><code class="language-html">&lt;section class=&quot;hero-container&quot;&gt;
+  &lt;div class=&quot;video-frame&quot;&gt;
+    &lt;video autoplay loop muted playsinline preload=&quot;metadata&quot; width=&quot;1920&quot; height=&quot;1080&quot;
+      poster=&quot;/images/hero-screencast-poster.webp&quot;
+      src=&quot;/videos/hero-screencast.mp4&quot;&gt;
+    &lt;/video&gt;
+  &lt;/div&gt;
+&lt;/section&gt;
+</code></pre>
+<p>with:</p>
+<pre><code class="language-css">/* Container sizing &amp; boundaries */
+.hero-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/*
+ * 1. aspect-ratio reserves the exact box before the media downloads.
+ * 2. Background color prevents flashes while the poster or first frame decodes.
+ */
+.video-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #0b0f17; /* Match your app or frame background */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* Ensure the video strictly fills the reserved container */
+.video-frame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</code></pre>
+<p>The poster, width &amp; height eliminate Cumulative Layout Shift (CLS) by ensuring the browser reserves the exact layout box before the video metadata loads, while providing a lightweight poster image to avoid a blank white or black flash.</p>
+<h2 id="webm">WebM</h2>
+<p>WebM can make it even smaller, is license free, but doesn't work on older Apple devices:</p>
+<pre><code>ffmpeg -i input.mp4 -c:v libvpx-vp9 -crf 32 -b:v 0 -an -speed 2 output.webm
+</code></pre>
+<ul>
+<li>-c:v libvpx-vp9: Modern VP9 video codec.</li>
+<li>-crf 32 -b:v 0: Constant Quality mode (adjust between 28 for higher quality and 36 for smaller size).</li>
+<li>-an: Strips audio tracks completely (mandatory for silent background video).</li>
+<li>-speed 2: Optimized balance between encoding speed and compression density.</li>
+</ul>
+<p>Alternatively use more modern AV1 instead of VP9:</p>
+<pre><code>ffmpeg -i input.mp4 -c:v libsvtav1 -crf 30 -preset 6 -pix_fmt yuv420p -an output-av1.webm
+</code></pre>
+<ul>
+<li>-c:v libsvtav1: The reference open-source AV1 encoder library (fast and heavily optimized for multi-core CPUs).</li>
+<li>-crf 30: AV1’s CRF scale behaves differently than H.264. Values between 28 and 34 yield visual transparency with tiny footprints.</li>
+<li>-preset 6: A practical balance between compute time and compression efficiency (preset 4 is slower and smaller; preset 8 is faster).</li>
+<li>-pix_fmt yuv420p: Enforces 8-bit 4:2:0 chroma subsampling for universal hardware and browser decoder compatibility.</li>
+<li>-an: Strips audio.</li>
+</ul>
+<p>Note: You can wrap AV1 into either .webm or .mp4—both containers support it, but .webm is standard for open web streaming.</p>
+<p>And then offer both:</p>
+<pre><code class="language-html">&lt;video autoplay loop muted playsinline ...&gt;
+  &lt;source src=&quot;hero.webm&quot; type=&quot;video/webm&quot;&gt; &lt;!-- Modern, lightweight --&gt;
+  &lt;source src=&quot;hero.mp4&quot; type=&quot;video/mp4&quot;&gt;   &lt;!-- Universal fallback --&gt;
+&lt;/video&gt;
+</code></pre>
+<p>Using only a single file (MP4) might be easier to start with.</p>
+<h2 id="mobile">Mobile</h2>
+<p>A desktop screencast scaled down to a 390px iPhone screen is usually unreadable.</p>
+<p>Use CSS media queries or separate <source> tags to serve:</p>
+<ul>
+<li>Desktop/Tablet: The 1080p/30fps landscape screencast.</li>
+<li>Mobile: A cropped 720p version focusing on the core action, or a lightweight static hero image/illustration with a &quot;Watch demo&quot; modal button to save mobile data.</li>
+</ul>
+<h2 id="gif">GIF</h2>
+<p>No way, José! (It has huge huge file size, and limited to a 256-color palette.)</p>
+</body>
+</html>
