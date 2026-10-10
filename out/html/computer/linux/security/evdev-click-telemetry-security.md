@@ -65,14 +65,16 @@ In NixOS or udev rules configuration (`/etc/udev/rules.d/70-mouse-uaccess.rules`
 
 ```udev
 KERNEL=="event*", SUBSYSTEM=="input", ENV{ID_INPUT_MOUSE}=="1", ENV{ID_INPUT_KEYBOARD}!="1", TAG+="uaccess"
+KERNEL=="event*", SUBSYSTEM=="input", ENV{ID_INPUT_TOUCHPAD}=="1", ENV{ID_INPUT_KEYBOARD}!="1", TAG+="uaccess"
 ```
 
 ### How It Works
 
-1. **Strict Filtering**: The rule checks `ENV{ID_INPUT_MOUSE}=="1"` and explicitly excludes any device acting as a keyboard (`ENV{ID_INPUT_KEYBOARD}!="1"`).
-2. **Dynamic ACL Assignment**: When matching, udev attaches `TAG+="uaccess"`. Systemd's `systemd-logind` builtin then grants read/write POSIX ACLs (`setfacl`) on those specific mouse character devices exclusively to the currently active desktop seat user.
-3. **No Keyboards Exposed**: Keyboards remain mode `0660 root:input` with no user ACLs, preventing any unprivileged user process from sniffing keystrokes.
-4. **No Group Management**: The user does not need to be in the `input` group, and permissions automatically transfer across desktop login sessions without logouts or system reboots.
+1. **Strict Filtering**: The rule checks `ENV{ID_INPUT_MOUSE}=="1"` (or touchpad) and explicitly excludes any device acting as a keyboard (`ENV{ID_INPUT_KEYBOARD}!="1"`).
+2. **Rule Ordering (Priority 70)**: The rule file must be prefixed with `70-` (e.g. `70-openscreen-mouse.rules`) so it is parsed before systemd's seat assignment (`71-seat.rules`) and ACL execution (`73-seat-late.rules`). In NixOS, this is achieved by providing the rule file through `services.udev.packages` rather than `services.udev.extraRules` (which generates `99-local.rules`).
+3. **Dynamic ACL Assignment**: When matching, udev attaches `TAG+="uaccess"`. Systemd's `systemd-logind` builtin then grants read/write POSIX ACLs (`setfacl`) on those specific mouse character devices exclusively to the currently active desktop seat user.
+4. **No Keyboards Exposed**: Keyboards remain mode `0660 root:input` with no user ACLs, preventing any unprivileged user process from sniffing keystrokes.
+5. **No Group Management**: The user does not need to be in the `input` group, and permissions automatically transfer across desktop login sessions without logouts or system reboots. To apply to already-connected devices immediately without re-plugging, run `sudo udevadm trigger --subsystem-match=input`.
 
 ## References
 
