@@ -1,4 +1,6 @@
-# Http
+# HTTP
+
+HTTP related Java libraries.
 
 ## Subcategories
 
