@@ -9,4 +9,4 @@ purl: pkg:maven/com.neovisionaries/nv-websocket-client
 
 High-quality WebSocket client implementation in Java.
 
-See https://github.com/TakahikoKawasaki/nv-websocket-client.
+See [https://github.com/TakahikoKawasaki/nv-websocket-client](https://github.com/TakahikoKawasaki/nv-websocket-client).
