@@ -35,6 +35,8 @@ If needed, until [openscreen#1104](https://github.com/getopenscreen/openscreen/i
 
 ## MP4
 
+[Use](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Video_codecs#recommendations_for_the_web) an MP4 container and the AVC (H.264) video codec (with AAC as your audio codec):
+
     ffmpeg -i input.mp4 -c:v libx264 -crf 23 -preset slow -an -movflags +faststart input-optimized23.mp4
 
 or with slightly lower quality for smaller file size:
@@ -138,4 +140,4 @@ Use CSS media queries or separate <source> tags to serve:
 
 ## GIF
 
-No way, José! (It has huge huge file size, and limited to a 256-color palette.)
+No way, José! (It has huge file size, and is limited to a 256-color palette.)
